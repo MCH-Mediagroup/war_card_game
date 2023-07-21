@@ -5,7 +5,6 @@ import { ethers } from 'ethers'
 // Components
 import Navigation from './Navigation';
 import Loading from './Loading';
-import Employees from './Employees';
 import Cards from './Cards';
 
 // ABIs: Import your contract ABIs here
@@ -17,9 +16,7 @@ import Cards from './Cards';
 function App() {
   const [account, setAccount] = useState(null)
   const [balance, setBalance] = useState(0)
-  const [employees, setEmployees] = useState([])
   const [cards, setCards] = useState([])
-  const [count, setCount] = useState(0)
 
 
   const [isLoading, setIsLoading] = useState(true)
@@ -41,19 +38,11 @@ function App() {
     setIsLoading(false)
   }
 
-  const fetchUserData = () => {
-    fetch("https://localhost:7132/api/Employee/getall")
-    .then(res => res.json())
-    .then(data => {
-        setEmployees(data)
-      })
-    }
     const fetchCardData = () => {
       fetch("https://localhost:7132/api/Cards/getcards")
         .then(res => res.json())
         .then(data => {
             setCards(data)
-            setCount(cards.Length)
           })
           
         }
@@ -61,7 +50,6 @@ function App() {
   useEffect(() => {
     if (isLoading) {
       loadBlockchainData()
-      fetchUserData()
       fetchCardData()
     }
   }, [isLoading]);
@@ -78,12 +66,8 @@ function App() {
         <>
           <p className='text-center'><strong>Your ETH Balance:</strong> {balance} ETH</p>
           <p className='text-center'>Edit App.js to add your code here.</p>
-          {/* <Employees 
-            employees={employees}
-          /> */}
           <Cards 
             cards={cards}
-            count={count}
           />
         </>
       )}

@@ -1,7 +1,12 @@
+import { useState } from 'react'
+
 import Table from 'react-bootstrap/Table';
 
-const Cards = ( {cards, count} ) => {
-    console.log(count)
+const Cards = ( {cards} ) => {
+  let [count, setCount] = useState(0)
+
+  count = setCount(cards.count)
+ //console.log(count)
     return (
         <>
         <div>
