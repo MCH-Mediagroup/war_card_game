@@ -29,27 +29,29 @@ function App() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
     const account = ethers.utils.getAddress(accounts[0])
     setAccount(account)
+    console.log(accounts, account)
 
-    // Fetch account balance
-    let balance = await provider.getBalance(account)
-    balance = ethers.utils.formatUnits(balance, 18)
-    setBalance(balance)
-
+    // // Fetch account balance
+    // let balance = await provider.getBalance(account)
+    // balance = ethers.utils.formatUnits(balance, 18)
+    // setBalance(balance)
+    // console.log(accounts, balance)
     setIsLoading(false)
   }
 
     const fetchCardData = () => {
-      fetch("https://localhost:7132/api/Cards/getcards")
+      fetch("https://localhost:5001/api/Cards/getcards")
         .then(res => res.json())
         .then(data => {
             setCards(data)
           })
-          
+          // console.log(cards)
+          setIsLoading(false)
         }
   
   useEffect(() => {
     if (isLoading) {
-      loadBlockchainData()
+      // loadBlockchainData()
       fetchCardData()
     }
   }, [isLoading]);
@@ -58,14 +60,15 @@ function App() {
     <Container>
       <Navigation account={account} />
 
-      <h1 className='my-4 text-center'>React Hardhat Template</h1>
+      <h1 className='my-4 text-center'>Let's Play War!</h1>
 
       {isLoading ? (
-        <Loading />
+        <></>
+        // <Loading />
       ) : (
         <>
-          <p className='text-center'><strong>Your ETH Balance:</strong> {balance} ETH</p>
-          <p className='text-center'>Edit App.js to add your code here.</p>
+          {/* <p className='text-center'><strong>Your ETH Balance:</strong> {balance} ETH</p>
+          <p className='text-center'>Edit App.js to add your code here.</p> */}
           <Cards 
             cards={cards}
           />

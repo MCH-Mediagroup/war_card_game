@@ -5,8 +5,8 @@ import Table from 'react-bootstrap/Table';
 const Cards = ( {cards} ) => {
   let [count, setCount] = useState(0)
 
-  count = setCount(cards.count)
- //console.log(count)
+  //count = setCount(cards.count)
+ //console.log(cards)
     return (
         <>
         <div>
