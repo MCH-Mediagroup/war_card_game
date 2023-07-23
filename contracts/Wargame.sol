@@ -8,13 +8,13 @@ contract Wargame {
     Token public token;
     uint256 public price;
     uint256 public maxTokens;
-    uint256 public tokensSold;
+    uint256 public tokensPaid;
     uint256 public timeDeployed;
 
 
     mapping(address => uint256) public whiteListed;
 
-    event Buy(uint256 amount, address buyer);
+    event PayPlayer(uint256 amount, address buyer);
 
     constructor(
         Token _token,
@@ -35,17 +35,17 @@ contract Wargame {
     }
     receive() external payable {
         uint256 amount = msg.value / price;
-        buyTokens(amount * 1e18);
+        payPlayer(amount * 1e18);
     }
 
-    function buyTokens(uint256 _amount) public payable {
+    function payPlayer(uint256 _amount) public payable {
         require(msg.value == (_amount / 1e18) * price);
         require(token.balanceOf(address(this)) >= _amount);
         require(token.transfer(msg.sender, _amount));
 
-        tokensSold += _amount;
+        tokensPaid += _amount;
 
-        emit Buy(_amount, msg.sender);
+        emit PayPlayer(_amount, msg.sender);
 
     }
     function setPrice(uint256 _price) public onlyOwner {
