@@ -47,7 +47,7 @@ describe('Wargame', () => {
       // Deploy Crowdsale
       wargame = await Wargame.deploy(token.address, ether(1), '1000000', DEPLOY_TIME)
 
-      // Send tokens to crowdsale
+      // Send tokens to wargame
       let transaction = await token.connect(deployer).transfer(wargame.address, tokens(1000000))
       await transaction.wait()
 
@@ -81,7 +81,7 @@ describe('Wargame', () => {
         })
 
         it('transfers tokens', async () => {
-          expect(await token.balanceOf(wargame.address)).to.equal(tokens(999990))
+          expect(await token.balanceOf(wargame.address)).to.equal(tokens(999950))
           expect(await token.balanceOf(user1.address)).to.equal(amount)
         })
 
