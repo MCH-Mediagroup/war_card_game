@@ -10,7 +10,9 @@ async function main() {
   let NAME = 'MCH Media Group'
   let SYMBOL = 'MCHT'
   let MAX_SUPPLY = '1000000'
-  const PRICE = ethers.utils.parseUnits('0.025', 'ether')
+  //const PRICE = ethers.utils.parseUnits('0.025', 'ether')
+  const COST = ethers.utils.parseUnits("1", "ether") // 1 ETH
+
   const DEPLOY_TIME = new Date().getTime();
   let accounts, deployer, user1, saletime, user2, user3
 
@@ -24,14 +26,14 @@ async function main() {
 
   // Deploy Wargame
   const Wargame = await hre.ethers.getContractFactory("Wargame")
-  const wargame = await Wargame.deploy(token.address, PRICE, ethers.utils.parseUnits(MAX_SUPPLY, 'ether'), DEPLOY_TIME)
+  const wargame = await Wargame.deploy(token.address, COST, ethers.utils.parseUnits(MAX_SUPPLY, 'ether'), DEPLOY_TIME)
   await wargame.deployed();
 
   let timeDeployed = await wargame.timeDeployed();
   timeDeployed = Number(timeDeployed);
 
 
-  console.log(`Crowdsale deployed to: ${wargame.address}\n`)
+  console.log(`Wargame deployed to: ${wargame.address}\n`)
   console.log("Time Deployed:", new Date(timeDeployed))
 
   let transaction = await token.transfer(wargame.address, ethers.utils.parseUnits(MAX_SUPPLY, 'ether'))
@@ -46,7 +48,6 @@ async function main() {
     // Deploy NFT
     NAME = "MCH Generated NFT"
     SYMBOL = "MCHNFT"
-    const COST = ethers.utils.parseUnits("1", "ether") // 1 ETH
   
     const NFT = await hre.ethers.getContractFactory("NFT")
     const nft = await NFT.deploy(NAME, SYMBOL, COST)

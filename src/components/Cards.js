@@ -1,11 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Table from 'react-bootstrap/Table';
 
-const Cards = ( {cards} ) => {
+const Cards = () => {
+
+  const [cards, setCards] = useState([])
+
   let [count, setCount] = useState(0)
 
-  //count = setCount(cards.count)
+  const fetchCardData = () => {
+    fetch("https://localhost:5001/api/Cards/getcards")
+      .then(res => res.json())
+      .then(data => {
+          setCards(data)
+        })
+        // console.log(cards)
+      }
+
+      useEffect(() => {
+        fetchCardData()
+    }, []);
+  
+  // setCount(cards.count)
  //console.log(cards)
     return (
         <>

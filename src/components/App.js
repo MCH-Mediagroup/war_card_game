@@ -1,11 +1,23 @@
 import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { Container } from 'react-bootstrap'
-import { ethers } from 'ethers'
 
 // Components
 import Navigation from './Navigation';
-import Loading from './Loading';
+import Tabs from './Tabs'
 import Cards from './Cards';
+import NFT from './NFT';
+import Admin from './Admin';
+
+import { 
+  loadProvider,
+  loadNetwork,
+  loadAccount,
+  loadToken,
+  loadWargame
+} from '../store/interactions';
+
 
 // ABIs: Import your contract ABIs here
 // import TOKEN_ABI from '../abis/Token.json'
@@ -14,31 +26,37 @@ import Cards from './Cards';
 // import config from '../config.json';
 
 function App() {
-  const [account, setAccount] = useState(null)
-  const [balance, setBalance] = useState(0)
+
+  const dispatch = useDispatch()
+
   const [cards, setCards] = useState([])
-
-
-  const [isLoading, setIsLoading] = useState(true)
 
   const loadBlockchainData = async () => {
     // Initiate provider
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const provider = await loadProvider(dispatch)
 
+    // Fetch current network's chainId (e.g. hardhat: 31337, kovan: 42)
+    const chainId = await loadNetwork(provider, dispatch)
+
+    // Reload page when network changes
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload()
+    })
+   
     // Fetch accounts
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-    const account = ethers.utils.getAddress(accounts[0])
-    setAccount(account)
-    console.log(accounts, account)
+    window.ethereum.on('accountsChanged', async () => {
+      await loadAccount(dispatch)
+    })
 
-    // // Fetch account balance
-    // let balance = await provider.getBalance(account)
-    // balance = ethers.utils.formatUnits(balance, 18)
-    // setBalance(balance)
-    // console.log(accounts, balance)
-    setIsLoading(false)
+
+    // Initiate contracts
+    await loadToken(provider, chainId, dispatch)
+    await loadWargame(provider, chainId, dispatch)
+
   }
 
+
+  
     const fetchCardData = () => {
       fetch("https://localhost:5001/api/Cards/getcards")
         .then(res => res.json())
@@ -46,36 +64,30 @@ function App() {
             setCards(data)
           })
           // console.log(cards)
-          setIsLoading(false)
         }
   
   useEffect(() => {
-    if (isLoading) {
-      // loadBlockchainData()
+      loadBlockchainData()
       fetchCardData()
-    }
-  }, [isLoading]);
+  }, []);
 
   return(
     <Container>
-      <Navigation account={account} />
+      <HashRouter>
+        <Navigation />
 
-      <h1 className='my-4 text-center'>Let's Play War!</h1>
+        <hr />
 
-      {isLoading ? (
-        <></>
-        // <Loading />
-      ) : (
-        <>
-          {/* <p className='text-center'><strong>Your ETH Balance:</strong> {balance} ETH</p>
-          <p className='text-center'>Edit App.js to add your code here.</p> */}
-          <Cards 
-            cards={cards}
-          />
-        </>
-      )}
+        <Tabs />
+
+        <Routes>
+          <Route exact path="/" element={<Cards />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/nft" element={<NFT />} />
+        </Routes>
+
+      </HashRouter>
     </Container>
   )
 }
-
 export default App;
