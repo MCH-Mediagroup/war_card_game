@@ -10,8 +10,8 @@ const Tabs = () => {
       <LinkContainer to="/admin">
         <Nav.Link>Admin</Nav.Link>
       </LinkContainer>
-      <LinkContainer to="/nft">
-        <Nav.Link>NFT</Nav.Link>
+      <LinkContainer to="/rewards">
+        <Nav.Link>Rewards</Nav.Link>
       </LinkContainer>
     </Nav>
   );

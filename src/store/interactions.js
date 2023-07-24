@@ -7,13 +7,14 @@ import {
 } from './reducers/provider'
 
 import { 
-    setContract,
-    setSymbol,
-    balanceLoaded
-} from './reducers/token'
+    setContracts,
+    setSymbols,
+    balancesLoaded
+} from './reducers/tokens'
 
 import { 
-    setWargame,
+    setContract,
+    setBalance
 } from './reducers/wargame'
 
 import TOKEN_ABI from '../abis/Token.json';
@@ -45,17 +46,23 @@ export const loadAccount = async (dispatch) => {
 
 // ------------------------------------------------------------------------------
 // LOAD CONTRACTS
-export const loadToken = async (provider, chainId, dispatch) => {
+export const loadTokens = async (provider, chainId, dispatch) => {
     const token = new ethers.Contract(config[chainId].token.address, TOKEN_ABI, provider)
   
-    dispatch(setContract(token))
-    dispatch(setSymbol(await token.symbol()))
+    dispatch(setContracts(token))
+    dispatch(setSymbols(await token.symbol()))
   }
 
   export const loadWargame = async (provider, chainId, dispatch) => {
     const wargame = new ethers.Contract(config[chainId].wargame.address, WARGAME_ABI, provider)
+    const balance = await wargame.balanceOf(account)
   
-    dispatch(setWargame(wargame))
+    dispatch(setBalance([
+      ethers.utils.formatUnits(balance.toString(), 'ether'),
+    ]))
+
+  
+    dispatch(setContract(wargame))
 
     return wargame
   }
@@ -63,11 +70,11 @@ export const loadToken = async (provider, chainId, dispatch) => {
 
 // ------------------------------------------------------------------------------
 // LOAD BALANCE 
-export const loadBalance = async (wargame, token, account, dispatch) => {
-    const balance = await token.balanceOf(account)
+export const loadBalances = async (tokens, account, dispatch) => {
+    const tokenBalance = await tokens[0].balanceOf(account)
   
-    dispatch(balanceLoaded([
-      ethers.utils.formatUnits(balance.toString(), 'ether'),
+    dispatch(balancesLoaded([
+      ethers.utils.formatUnits(tokenBalance.toString(), 'ether'),
     ]))
 
   }

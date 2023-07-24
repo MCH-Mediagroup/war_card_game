@@ -7,14 +7,14 @@ import { Container } from 'react-bootstrap'
 import Navigation from './Navigation';
 import Tabs from './Tabs'
 import Cards from './Cards';
-import NFT from './NFT';
+import Rewards from './Rewards';
 import Admin from './Admin';
 
 import { 
   loadProvider,
   loadNetwork,
   loadAccount,
-  loadToken,
+  loadTokens,
   loadWargame
 } from '../store/interactions';
 
@@ -50,25 +50,15 @@ function App() {
 
 
     // Initiate contracts
-    await loadToken(provider, chainId, dispatch)
+    await loadTokens(provider, chainId, dispatch)
     await loadWargame(provider, chainId, dispatch)
 
   }
 
-
-  
-    const fetchCardData = () => {
-      fetch("https://localhost:5001/api/Cards/getcards")
-        .then(res => res.json())
-        .then(data => {
-            setCards(data)
-          })
-          // console.log(cards)
-        }
+ 
   
   useEffect(() => {
       loadBlockchainData()
-      fetchCardData()
   }, []);
 
   return(
@@ -83,7 +73,7 @@ function App() {
         <Routes>
           <Route exact path="/" element={<Cards />} />
           <Route path="/admin" element={<Admin />} />
-          <Route path="/nft" element={<NFT />} />
+          <Route path="/rewards" element={<Rewards />} />
         </Routes>
 
       </HashRouter>
