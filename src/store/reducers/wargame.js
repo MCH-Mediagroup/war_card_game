@@ -4,7 +4,7 @@ export const wargame = createSlice({
   name: 'wargame',
   initialState: {
     contract: null,
-    balance: null
+    balance: 0
   },
   reducers: {
     setContract: (state, action) => {

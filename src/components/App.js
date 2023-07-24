@@ -7,6 +7,7 @@ import { Container } from 'react-bootstrap'
 import Navigation from './Navigation';
 import Tabs from './Tabs'
 import Cards from './Cards';
+import Wargame from './Wargame';
 import Rewards from './Rewards';
 import Admin from './Admin';
 
@@ -29,8 +30,6 @@ function App() {
 
   const dispatch = useDispatch()
 
-  const [cards, setCards] = useState([])
-
   const loadBlockchainData = async () => {
     // Initiate provider
     const provider = await loadProvider(dispatch)
@@ -51,6 +50,7 @@ function App() {
 
     // Initiate contracts
     await loadTokens(provider, chainId, dispatch)
+    // console.log(tokens)
     await loadWargame(provider, chainId, dispatch)
 
   }
@@ -71,9 +71,10 @@ function App() {
         <Tabs />
 
         <Routes>
-          <Route exact path="/" element={<Cards />} />
+          <Route exact path="/" element={<Wargame />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/rewards" element={<Rewards />} />
+          {/* <Route path="/wargame" element={<Wargame />} /> */}
         </Routes>
 
       </HashRouter>

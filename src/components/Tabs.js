@@ -5,7 +5,7 @@ const Tabs = () => {
   return (
     <Nav variant="pills" defaultActiveKey="/" className='justify-content-center my-4'>
       <LinkContainer to="/">
-        <Nav.Link>Game</Nav.Link>
+        <Nav.Link>War Card Game</Nav.Link>
       </LinkContainer>
       <LinkContainer to="/admin">
         <Nav.Link>Admin</Nav.Link>
@@ -13,6 +13,9 @@ const Tabs = () => {
       <LinkContainer to="/rewards">
         <Nav.Link>Rewards</Nav.Link>
       </LinkContainer>
+      {/* <LinkContainer to="/testcard">
+        <Nav.Link>Test Card</Nav.Link>
+      </LinkContainer> */}
     </Nav>
   );
 }

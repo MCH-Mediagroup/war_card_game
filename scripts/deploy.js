@@ -6,6 +6,12 @@
 // global scope, and execute the script.
 const hre = require("hardhat");
 
+const tokens = (n) => {
+  return ethers.utils.parseUnits(n.toString(), 'ether')
+}
+
+const ether = tokens
+
 async function main() {
   let NAME = 'MCH Media Group'
   let SYMBOL = 'MCHT'
@@ -15,7 +21,6 @@ async function main() {
 
   const DEPLOY_TIME = new Date().getTime();
   let accounts, deployer, user1, saletime, user2, user3
-
 
   // Deploy Token
   const Token = await hre.ethers.getContractFactory("Token")
@@ -39,11 +44,19 @@ async function main() {
   let transaction = await token.transfer(wargame.address, ethers.utils.parseUnits(MAX_SUPPLY, 'ether'))
   await transaction.wait()
 
-  console.log(`Tokens transferred to Wargame\n`)
+  let tokensDeployed = await token.balanceOf(wargame.address)
 
-  // Configure Accounts
-  accounts = await ethers.getSigners()
-  deployer = accounts[0]
+
+  console.log(`${tokensDeployed} Tokens transferred to Wargame\n`)
+
+  // // Configure Accounts
+  // accounts = await ethers.getSigners()
+  // deployer = accounts[0]
+
+  // // Send tokens to investors - each one gets 20%
+  // transaction = await token.transfer(deployer.address, tokens(250))
+  // await transaction.wait()
+  
 
     // Deploy NFT
     NAME = "MCH Generated NFT"
