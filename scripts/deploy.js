@@ -5,6 +5,7 @@
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
 const hre = require("hardhat");
+const config = require('../src/config.json')
 
 const tokens = (n) => {
   return ethers.utils.parseUnits(n.toString(), 'ether')
@@ -20,11 +21,11 @@ async function main() {
   const COST = ethers.utils.parseUnits("1", "ether") // 1 ETH
 
   const DEPLOY_TIME = new Date().getTime();
-  let accounts, deployer, user1, saletime, user2, user3
+  let accounts, deployer, user1, saletime, user2, user3, player
 
   // Deploy Token
   const Token = await hre.ethers.getContractFactory("Token")
-  const token = await Token.deploy(NAME, SYMBOL, MAX_SUPPLY)
+  let token = await Token.deploy(NAME, SYMBOL, MAX_SUPPLY)
   await token.deployed()
 
   console.log(`Token deployed to: ${token.address}\n`)
@@ -49,14 +50,27 @@ async function main() {
 
   console.log(`${tokensDeployed} Tokens transferred to Wargame\n`)
 
-  // // Configure Accounts
-  // accounts = await ethers.getSigners()
-  // deployer = accounts[0]
+  // Configure Accounts
+  accounts = await ethers.getSigners()
+  deployer = accounts[0]
+  player = accounts[1]
 
-  // // Send tokens to investors - each one gets 20%
-  // transaction = await token.transfer(deployer.address, tokens(250))
-  // await transaction.wait()
+  // Fetch network
+  const { chainId } = await ethers.provider.getNetwork()
+
+  console.log(`Fetching token and transferring to accounts...\n`)
+
+  //token = await ethers.getContractAt('Token', config[chainId].token.address)
+  console.log(`Player Address: ${player.address}\n`)
+
+
+
+  // Send tokens to player
+  let amount = tokens(50)
+  transaction = await wargame.connect(player).payPlayer(amount, { value: ether(50) })
+  await transaction.wait()
   
+  console.log(`Player Amount: ${ await token.balanceOf(player.address)}\n`)
 
     // Deploy NFT
     NAME = "MCH Generated NFT"
