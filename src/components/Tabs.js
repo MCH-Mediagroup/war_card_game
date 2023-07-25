@@ -13,9 +13,9 @@ const Tabs = () => {
       <LinkContainer to="/rewards">
         <Nav.Link>Rewards</Nav.Link>
       </LinkContainer>
-      {/* <LinkContainer to="/testcard">
+      <LinkContainer to="/testcard">
         <Nav.Link>Test Card</Nav.Link>
-      </LinkContainer> */}
+      </LinkContainer>
     </Nav>
   );
 }

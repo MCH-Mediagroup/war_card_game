@@ -13,7 +13,10 @@ import {
 
 import { 
     setContract,
-    setBalance
+    setBalance,
+    payPlayerRequest,
+    payPlayerSuccess,
+    payPlayerFail
 } from './reducers/wargame'
 
 import TOKEN_ABI from '../abis/Token.json';
@@ -82,4 +85,30 @@ export const loadTokens = async (provider, chainId, dispatch) => {
 //     ]))
 
 //   }
+// ------------------------------------------------------------------------------
+// ADD LIQUDITY
+export const payPlayer = async (provider, wargame, amount,  dispatch) => {
+  try {
+    dispatch(payPlayerRequest())
+
+    const signer = await provider.getSigner()
+    // We need to calculate the required ETH in order to buy the tokens...
+    // Fetch price
+    const price = ethers.utils.formatUnits(await wargame.price(), 18)
+
+    const value = ethers.utils.parseUnits((amount * price).toString(), 'ether')
+    const formattedAmount = ethers.utils.parseUnits(amount.toString(), 'ether')
+
+    const transaction = await wargame.connect(signer).payPlayer(formattedAmount, { value: value })
+
+    await transaction.wait()
+
+    dispatch(payPlayerSuccess(transaction.hash))
+
+  } catch (error) {
+    dispatch(payPlayerFail())
+  }
+
+
+}
 

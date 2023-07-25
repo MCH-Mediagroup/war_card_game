@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
 import Table from 'react-bootstrap/Table';
+import Button from 'react-bootstrap/Button';
+
 import './War.css';
 
 const Wargame = () => {
@@ -22,7 +24,9 @@ const Wargame = () => {
 
     // Cards Game below this comment
     //  The cards from the API is called randomCards
-  
+    const player1HandRef = useRef(null);
+    const player2HandRef = useRef(null);
+
     var suits = ["spades", "hearts", "clubs", "diams"];
     var cardFace = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
     var cards = [];
@@ -184,14 +188,16 @@ const Wargame = () => {
     <div id="board">
         <div id="player1" className="players">
             <div>SCORE:<span className="score"></span></div>
-            <div className="hand"></div>
+            <div className="hand" ref={player1HandRef}></div>
         </div>
         <div id="player2" className="players">
             <div>SCORE:<span className="score"></span></div>
-            <div className="hand"></div>
+            <div className="hand" ref={player2HandRef}></div>
         </div>
         <div id="action">
-            <button id="btnBattle" type="button" className="btn">Fight</button>
+        <Button  onClick={battle}>Fight</Button>
+
+            {/* <button id="btnBattle" type="button" className="btn">Fight</button> */}
 
         </div>
     </div>

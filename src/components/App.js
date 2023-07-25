@@ -6,7 +6,6 @@ import { Container } from 'react-bootstrap'
 // Components
 import Navigation from './Navigation';
 import Tabs from './Tabs'
-import Cards from './Cards';
 import Wargame from './Wargame';
 import Rewards from './Rewards';
 import Admin from './Admin';
@@ -18,6 +17,7 @@ import {
   loadTokens,
   loadWargame
 } from '../store/interactions';
+import TestCard from './TestCard';
 
 
 // ABIs: Import your contract ABIs here
@@ -74,7 +74,7 @@ function App() {
           <Route exact path="/" element={<Wargame />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/rewards" element={<Rewards />} />
-          {/* <Route path="/wargame" element={<Wargame />} /> */}
+          <Route path="/testcard" element={<TestCard />} />
         </Routes>
 
       </HashRouter>
@@ -82,3 +82,4 @@ function App() {
   )
 }
 export default App;
+// 

@@ -1,48 +1,126 @@
 import { useEffect, useState } from 'react'
 
+import { useSelector, useDispatch } from 'react-redux'
+import Button from 'react-bootstrap/Button';
 import { ethers } from 'ethers'
+import { loadWargame } from '../store/interactions'
 
-import TOKEN_ABI from '../abis/Token.json';
-import WARGAME_ABI from '../abis/Wargame.json';
-import config from '../config.json';
-import './War.css';
+import Alert from './Alert'
+
+import {
+  payPlayer
+} from '../store/interactions'
+
 
 const TestCard = () => {
-    const [provider, setProvider] = useState(null)
-    const [account, setAccount] = useState(null)
-    const [accountBalance, setAccountBalance] = useState(0)
+  const provider = useSelector(state => state.provider.connection)
 
-    const [wargame, setWargame] = useState(null)
+  const tokens = useSelector(state => state.tokens.contracts)
+  const symbols = useSelector(state => state.tokens.symbols)
+  const wargame = useSelector(state => state.wargame.contract)
+  const balance = useSelector(state => state.wargame.balance)
 
-    const loadBlockchainData = async () => {
-        // Initiate provider
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
-        setProvider(provider)
-    
-        // Initiate contracts
-        const token = new ethers.Contract(config[31337].token.address, TOKEN_ABI, provider)
-        const wargame = new ethers.Contract(config[31337].wargame.address, WARGAME_ABI, provider)
-        setWargame(wargame)
-    
-        // Fetch accounts
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const account = ethers.utils.getAddress(accounts[0])
-        setAccount(account)
+  const [showAlert, setShowAlert] = useState(false)
 
-        // Fetch account balance
-        const accountBalance = ethers.utils.formatUnits(await token.balanceOf(wargame.address), 18)
-        setAccountBalance(accountBalance)
-        console.log(accountBalance)
-        
-    
-    }
+  const [accountBalance, setAccountBalance] = useState(0)
+  let [playerTokens, setPlayerTokens] = useState(50)
+  let [gameTokens, setGameTokens] = useState(50)
+  let [tokensPaid, setTokensPaid] = useState(50)
+
+
+
+  const dispatch = useDispatch()
+  const loadInitialData = async () => {
+
+    // Fetch account balance
+    //setAccountBalance(balance)
+    // Fetch tokens sold
+    setTokensPaid(ethers.utils.formatUnits(await wargame.tokensPaid(), 18))
+
+    console.log(balance)
+
+}
+const betAllHandler = async () => {
+  // e.preventDefault()
+  setShowAlert(false)
+
+  setGameTokens(playerTokens + 100)
+
+  console.log(`Game Tokens betting all: ${gameTokens}\n`)
+
+  setPlayerTokens(0)
+
+
+  setShowAlert(true)
+
+}
+const payPlayerHandler = async () => {
+  // e.preventDefault()
+  console.log(`Game Tokens before: ${gameTokens}\n`)
+  console.log(`Player Tokens before: ${playerTokens}\n`)
+
+
+  setShowAlert(false)
+  
+  const testWinState = Math.floor(Math.random() * 4);
+
+  let totalTokensWon = 0;
+
+  switch( testWinState ) {
+    case 1: // Win before timer expires
+      totalTokensWon = gameTokens + 100;
+      break;
+    case 2: // Win after timer expires
+      totalTokensWon = gameTokens + 50;
+      break;
+    case 3: // Draw
+      totalTokensWon = gameTokens;
+      break;
+    default: // Lose
+    totalTokensWon = 0;
+  }
+
+  setPlayerTokens(totalTokensWon)
+  playerTokens = totalTokensWon
+  console.log(`Winning State: ${testWinState}\n`)
+  console.log(`Total Player Tokens won: ${playerTokens}\n`)
+  console.log(`Total Tokens won: ${totalTokensWon}\n`)
+
+
+
+
+  const _tokenAmount = playerTokens
+
+  playerTokens !== 0 && await payPlayer(
+      provider,
+      wargame,
+      playerTokens,
+      dispatch
+  )
+// reset player tokens
+setPlayerTokens(50)
+setGameTokens(50)
+playerTokens = 50
+gameTokens = 50
+console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
+
+setShowAlert(true)
+
+}
 
       useEffect(() => {
-          loadBlockchainData()
+        loadInitialData()
       }, []);
     
       return (
         <>
+          <p className='text-center'><strong>Total Token Balance:</strong> {balance} ETH</p>
+          <p className='text-center'><strong>Player Token Balance:</strong> {playerTokens} ETH</p>
+          <p className='text-center my-3'>{tokensPaid} / {balance} Tokens paid</p>
+
+          <Button  onClick={betAllHandler}>Bet it All!</Button>
+          <Button  onClick={payPlayerHandler}>Simulate Play</Button>
+
         </>
       )
 }
