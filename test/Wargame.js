@@ -76,14 +76,8 @@ describe('Wargame', () => {
         beforeEach(async () => {
           // console.log("whitelist count:", await crowdsale.whiteListCount())
           // console.log("whitelisted record:", await crowdsale.whiteListed(user1.address))
-          amount = tokens(100)
-          transaction = await token.connect(deployer).approve(wargame.address, amount)
-          transaction = await token.connect(deployer).transferFrom(wargame.address, user1.address, amount)
-
-    
-          // transaction = await wargame.connect(user1).payPlayer(wargame.address, amount, { value: ether(50) })
+          transaction = await wargame.connect(user1).payPlayer(amount, { value: ether(50) })
           result = await transaction.wait()
-          // console.log(`Game Symbol: ${await token.symbol()}\n`)
         })
 
         it('transfers tokens', async () => {

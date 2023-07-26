@@ -33,16 +33,15 @@ contract Wargame {
         require(msg.sender == owner, "Caller is not the owner");
         _;
     }
-    // receive() external payable {
-    //     uint256 amount = msg.value / price;
-    //     payPlayer(amount * 1e18);
-    // }
+    receive() external payable {
+        uint256 amount = msg.value / price;
+        payPlayer(amount * 1e18);
+    }
 
-    function payPlayer(address _wargame, uint256 _amount) public payable {
+    function payPlayer(uint256 _amount) public payable {
         require(msg.value == (_amount / 1e18) * price);
         require(token.balanceOf(address(this)) >= _amount);
-        require(token.approve(owner, _amount));
-        require(token.transferFrom(_wargame, msg.sender, _amount));
+        require(token.transfer(msg.sender, _amount));
 
         tokensPaid += _amount;
 
