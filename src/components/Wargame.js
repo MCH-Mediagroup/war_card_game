@@ -88,8 +88,8 @@ const Wargame = () => {
                     p1.innerHTML = showCard(card1, 0);
                     p2.innerHTML = showCard(card2, 0);
                     checkWinner(card1, card2, pot);
-                    s1.innerHTML = players[0].length;
-                    s2.innerHTML = players[1].length;
+                    s1.innerHTML = players[0].length; 
+                    s2.innerHTML = players[1].length; 
                 } else {
                     outputMessage("Game over");
                 }
