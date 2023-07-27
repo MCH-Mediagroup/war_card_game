@@ -8,17 +8,21 @@ import { loadWargame } from '../store/interactions'
 import Alert from './Alert'
 
 import {
-  payPlayer
+  payPlayer,
+  loadBalances
 } from '../store/interactions'
 
 
 const TestCard = () => {
   const provider = useSelector(state => state.provider.connection)
+  const account = useSelector(state => state.provider.account)
 
   const tokens = useSelector(state => state.tokens.contracts)
   const symbols = useSelector(state => state.tokens.symbols)
   const wargame = useSelector(state => state.wargame.contract)
   const balance = useSelector(state => state.wargame.balance)
+  const balances = useSelector(state => state.tokens.balances)
+
 
   const [showAlert, setShowAlert] = useState(false)
 
@@ -97,6 +101,9 @@ const payPlayerHandler = async () => {
       playerTokens,
       dispatch
   )
+
+  await loadBalances(tokens, account, dispatch)
+
 // reset player tokens
 setPlayerTokens(50)
 setGameTokens(50)
@@ -116,6 +123,7 @@ setShowAlert(true)
         <>
           <p className='text-center'><strong>Total Token Balance:</strong> {balance} ETH</p>
           <p className='text-center'><strong>Player Token Balance:</strong> {playerTokens} ETH</p>
+          <p className='text-center'><strong>Player Token Total Balance:</strong> {balances} ETH</p>
           <p className='text-center my-3'>{tokensPaid} / {balance} Tokens paid</p>
 
           <Button  onClick={betAllHandler}>Bet it All!</Button>

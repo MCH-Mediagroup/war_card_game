@@ -8,7 +8,8 @@ import {
 
 import { 
     setContracts,
-    setSymbols
+    setSymbols,
+    balancesLoaded
 } from './reducers/tokens'
 
 import { 
@@ -73,18 +74,19 @@ export const loadTokens = async (provider, chainId, dispatch) => {
   }
 
 
-// //------------------------------------------------------------------------------
-// // LOAD BALANCE 
-// export const loadBalances = async (wargame, token, dispatch) => {
-//     // const tokenBalance = await tokens[0].balanceOf(account)
-//     // const token = new ethers.Contract(config[chainId].token.address, TOKEN_ABI, provider)
-//     const wargameBalance = ethers.utils.formatUnits(await token.balanceOf(wargame), 18)
+//------------------------------------------------------------------------------
+// LOAD BALANCE 
+export const loadBalances = async (token, account, dispatch) => {
+    // const tokenBalance = await tokens[0].balanceOf(account)
+    // const token = new ethers.Contract(config[chainId].token.address, TOKEN_ABI, provider)
+    const balance1 = await token.balanceOf(account)
+    //const wargameBalance = ethers.utils.formatUnits(await token.balanceOf(wargame), 18)
   
-//     dispatch(balancesLoaded([
-//       ethers.utils.formatUnits(wargameBalance.toString(), 'ether'),
-//     ]))
+    dispatch(balancesLoaded([
+      ethers.utils.formatUnits(balance1.toString(), 'ether'),
+    ]))
 
-//   }
+  }
 // ------------------------------------------------------------------------------
 // ADD LIQUDITY
 export const payPlayer = async (provider, wargame, amount,  dispatch) => {
@@ -93,15 +95,15 @@ export const payPlayer = async (provider, wargame, amount,  dispatch) => {
 
     const signer = await provider.getSigner()
 
-    const prc = 0
-    // We need to calculate the required ETH in order to buy the tokens...
-    // Fetch price
-    const price = ethers.utils.formatUnits(await prc, 18)
+    // const prc = 0
+    // // We need to calculate the required ETH in order to buy the tokens...
+    // // Fetch price
+    // const price = ethers.utils.formatUnits(await prc, 18)
 
-    const value = ethers.utils.parseUnits((amount * price).toString(), 'ether')
+    // const value = ethers.utils.parseUnits((amount * price).toString(), 'ether')
     const formattedAmount = ethers.utils.parseUnits(amount.toString(), 'ether')
 
-    const transaction = await wargame.connect(signer).payPlayer(formattedAmount, { value: value })
+    const transaction = await wargame.connect(signer).payPlayer(formattedAmount, { value: 0 })
 
     await transaction.wait()
 

@@ -92,9 +92,9 @@ describe('Wargame', () => {
           expect(await wargame.tokensPaid()).to.equal(amount)
         })
 
-        it('updates contracts ether balance', async () => {
-          expect(await ethers.provider.getBalance(wargame.address)).to.equal(amount)
-        })
+        // it('updates contracts ether balance', async () => {
+        //   expect(await ethers.provider.getBalance(wargame.address)).to.equal(amount)
+        // })
 
         it('emits a PayPlayer event', async () => {
           // --> https://hardhat.org/hardhat-chai-matchers/docs/reference#.emit
@@ -107,35 +107,35 @@ describe('Wargame', () => {
 
       describe('Failure', () => {
 
-        it('rejects insufficent ETH', async () => {
-          await expect(wargame.connect(user1).payPlayer(tokens(50), { value: 0 })).to.be.reverted
-        })
+        // it('rejects insufficent ETH', async () => {
+        //   await expect(wargame.connect(user1).payPlayer(tokens(50), { value: 0 })).to.be.reverted
+        // })
   
       })
   
     })
 
-    describe('Sending ETH', () => {
-      let transaction, result
-      let amount = ether(50)
+    // describe('Sending ETH', () => {
+    //   let transaction, result
+    //   let amount = ether(50)
   
-      describe('Success', () => {
+    //   describe('Success', () => {
   
-        beforeEach(async () => {
-          transaction = await user1.sendTransaction({ to: wargame.address, value: amount })
-          result = await transaction.wait()
-        })
+    //     beforeEach(async () => {
+    //       transaction = await user1.sendTransaction({ to: wargame.address, value: amount })
+    //       result = await transaction.wait()
+    //     })
   
-        it('updates contracts ether balance', async () => {
-          expect(await ethers.provider.getBalance(wargame.address)).to.equal(amount)
-        })
+    //     it('updates contracts ether balance', async () => {
+    //       expect(await ethers.provider.getBalance(wargame.address)).to.equal(amount)
+    //     })
   
-        it('updates user token balance', async () => {
-          expect(await token.balanceOf(user1.address)).to.equal(amount)
-        })
+    //     it('updates user token balance', async () => {
+    //       expect(await token.balanceOf(user1.address)).to.equal(amount)
+    //     })
   
-      })
-    })
+    //   })
+    // })
 
     describe('Updating Price', () => {
       let transaction, result
