@@ -67,7 +67,7 @@ async function main() {
 
   // Send tokens to player
   let amount = tokens(50)
-  transaction = await wargame.connect(player).payPlayer(amount, { value: ether(50) })
+  transaction = await wargame.connect(player).payPlayer(amount, { value: ether(0) })
   await transaction.wait()
   
   console.log(`Player Amount: ${ await token.balanceOf(player.address)}\n`)

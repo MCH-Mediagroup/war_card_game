@@ -3,7 +3,9 @@
     public class Card
     {
         public int Id { get; set; }
-        public string CardName { get; set; } = string.Empty;
-        public string Suit { get; set; } = string.Empty;
+        public string suit { get; set; }
+        public string num { get; set; } 
+        public int cardValue { get; set; }
+        public string icon { get; set; }
     }
 }

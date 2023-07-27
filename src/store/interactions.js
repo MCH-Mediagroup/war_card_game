@@ -92,9 +92,11 @@ export const payPlayer = async (provider, wargame, amount,  dispatch) => {
     dispatch(payPlayerRequest())
 
     const signer = await provider.getSigner()
+
+    const prc = 0
     // We need to calculate the required ETH in order to buy the tokens...
     // Fetch price
-    const price = ethers.utils.formatUnits(await wargame.price(), 18)
+    const price = ethers.utils.formatUnits(await prc, 18)
 
     const value = ethers.utils.parseUnits((amount * price).toString(), 'ether')
     const formattedAmount = ethers.utils.parseUnits(amount.toString(), 'ether')

@@ -1,21 +1,21 @@
 import { useRef, useEffect, useState } from 'react'
 
-import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 
 import './War.css';
 
 const Wargame = () => {
 
-  const [randomCards, setCards] = useState([])
+  let [data, setCards] = useState([])
 
   const fetchCardData = () => {
     fetch("https://localhost:5001/api/Cards/getcards")
       .then(res => res.json())
       .then(data => {
           setCards(data)
+        //   console.log(data)
         })
-        // console.log(cards)
+         //console.log(cards)
       }
 
       useEffect(() => {
@@ -27,9 +27,9 @@ const Wargame = () => {
     const player1HandRef = useRef(null);
     const player2HandRef = useRef(null);
 
-    var suits = ["spades", "hearts", "clubs", "diams"];
-    var cardFace = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-    var cards = [];
+    // var suits = ["spades", "hearts", "clubs", "diams"];
+    // var cardFace = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+    var cards = data;
     var players = [
         [],
         []
@@ -38,7 +38,7 @@ const Wargame = () => {
     var gameover = false;
     var timer;
     var r = 0;
-    var fightButton = document.querySelector("#btnBattle");
+    // var fightButton = document.querySelector("#btnBattle");
 
     var p1 = document.querySelector("#player1 .hand");
     var p2 = document.querySelector("#player2 .hand");
@@ -56,12 +56,12 @@ const Wargame = () => {
 
     
               //functions
-              function rounds(a) {
-                r = a;
-                timer = setInterval(function () {
-                    battle()
-                }, 100);
-            }
+            //   function rounds(a) {
+            //     r = a;
+            //     timer = setInterval(function () {
+            //         battle()
+            //     }, 100);
+            // }
     
             function battle() {
                 if (timer) {
@@ -73,8 +73,8 @@ const Wargame = () => {
                 }
                 if (firstRun) {
                     firstRun = false;
-                    buildCards();
-                    shuffleArray(cards);
+                    // buildCards();
+                    // shuffleArray(cards);
                     dealCards(cards);
                 }
                 attack();
@@ -128,7 +128,7 @@ const Wargame = () => {
                         pot = pot.concat(card1);
                         p1.innerHTML += showCard(card1, (pos + i));
                     }
-                    for (var i = 0; i < 4; i++) {
+                    for (i = 0; i < 4; i++) {
                         card2 = players[1].shift();
                         pot = pot.concat(card2);
                         p2.innerHTML += showCard(card2, (pos + i));
@@ -147,21 +147,21 @@ const Wargame = () => {
                 return bCard;
             }
     
-            function buildCards() {
-                cards = [];
-                for (var s in suits) {
-                    var suitNew = suits[s][0].toUpperCase();
-                    for (var n in cardFace) {
-                        var card = {
-                            suit: suits[s],
-                            num: cardFace[n],
-                            cardValue: parseInt(n) + 2,
-                            icon: suitNew
-                        }
-                        cards.push(card);
-                    }
-                }
-            }
+            // function buildCards() {
+            //     cards = [];
+            //     for (var s in suits) {
+            //         var suitNew = suits[s][0].toUpperCase();
+            //         for (var n in cardFace) {
+            //             var card = {
+            //                 suit: suits[s],
+            //                 num: cardFace[n],
+            //                 cardValue: parseInt(n) + 2,
+            //                 icon: suitNew
+            //             }
+            //             cards.push(card);
+            //         }
+            //     }
+            // }
     
             function dealCards(array) {
                 for (var i = 0; i < array.length; i++) {
@@ -170,15 +170,15 @@ const Wargame = () => {
                 }
             }
     
-            function shuffleArray(array) {
-                for (var x = array.length - 1; x > 0; x--) {
-                    var ii = Math.floor(Math.random() * (x + 1));
-                    var temp = array[x];
-                    array[x] = array[ii];
-                    array[ii] = temp;
-                }
-                return array;
-            }
+            // function shuffleArray(array) {
+            //     for (var x = array.length - 1; x > 0; x--) {
+            //         var ii = Math.floor(Math.random() * (x + 1));
+            //         var temp = array[x];
+            //         array[x] = array[ii];
+            //         array[ii] = temp;
+            //     }
+            //     return array;
+            // }
 
 
     return (
