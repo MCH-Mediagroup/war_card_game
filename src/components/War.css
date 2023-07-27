@@ -13,19 +13,19 @@
 
 .cardtop {
     font-size: 2em;
-    height: 40px;
+    height:40px;
     line-height: 0.7em;
 }
 
 .cardmid {
     text-align: center;
-    font-size: 5em;
-    height: 110px;
+    font-size: 4em;
+    height: 105px;
 }
 
 .cardbottom {
     font-size: 2em;
-    height: 50px;
+    height: 35px;
     line-height: 0.7em;
     transform: rotate(-180deg);
     -webkit-transform: rotate(-180deg);
