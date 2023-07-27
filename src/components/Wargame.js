@@ -9,7 +9,7 @@ const Wargame = () => {
   let [data, setCards] = useState([])
 
   const fetchCardData = () => {
-    fetch("https://localhost:5001/api/Cards/getcards")
+    fetch("http://192.168.254.133:5050/api/Cards/getcards")
       .then(res => res.json())
       .then(data => {
           setCards(data)

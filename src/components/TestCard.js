@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 
 import { useSelector, useDispatch } from 'react-redux'
+import Countdown from 'react-countdown'
 import Button from 'react-bootstrap/Button';
 import { ethers } from 'ethers'
-import { loadWargame } from '../store/interactions'
 
 import Alert from './Alert'
 
@@ -16,6 +16,7 @@ import {
 const TestCard = () => {
   const provider = useSelector(state => state.provider.connection)
   const account = useSelector(state => state.provider.account)
+  const [gameTime, setGameTime] = useState(0)
 
   const tokens = useSelector(state => state.tokens.contracts)
   const symbols = useSelector(state => state.tokens.symbols)
@@ -27,6 +28,7 @@ const TestCard = () => {
   const [showAlert, setShowAlert] = useState(false)
 
   const [accountBalance, setAccountBalance] = useState(0)
+
   let [playerTokens, setPlayerTokens] = useState(50)
   let [gameTokens, setGameTokens] = useState(50)
   let [tokensPaid, setTokensPaid] = useState(50)
@@ -114,13 +116,52 @@ console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
 setShowAlert(true)
 
 }
+    // Fetch Countdown
+    // For Testing
+    const MINUTES_TO_ADD = 60000 * 3  // 3 minute
+    const GAME_TIMER = (new Date().getTime() + (MINUTES_TO_ADD)).toString().slice(0, 10);
+    let gameOn = GAME_TIMER
+    // For Testing
 
       useEffect(() => {
         loadInitialData()
+        setGameTime(gameOn.toString() + '000')
       }, []);
-    
+
+
+
+
+      const Completionist = () => <strong>The Mint is Open!</strong>;
+
+// Renderer callback with condition
+const renderer = ({ days, hours, minutes, seconds, completed }) => {
+  if (completed) {
+    // setCountdownComplete(true)
+    // Render a completed state
+    return (
+      <>
+    <Completionist />
+   
+  </>)
+  } else {
+    // Render a countdown
+    return (
+      <>
+      <strong>You have: </strong>
+      <strong>{minutes} Minutes : {seconds} Seconds </strong>
+      <strong>to finish! </strong>
+    </>
+    );
+  }
+};
+
+      
       return (
         <>
+          <div className='my-4 text-center'>
+           <Countdown date={parseInt(gameTime)} className='h2' renderer={renderer} />
+           {/* <Countdown date={parseInt(gameTime)} className='h2' /> */}
+          </div>
           <p className='text-center'><strong>Total Token Balance:</strong> {balance} ETH</p>
           <p className='text-center'><strong>Player Token Balance:</strong> {playerTokens} ETH</p>
           <p className='text-center'><strong>Player Token Total Balance:</strong> {balances} ETH</p>
