@@ -5,6 +5,7 @@ export const wargame = createSlice({
   initialState: {
     contract: null,
     balance: 0,
+    time: 0,
     paying: {
       isPaying: false,
       isSucccess: false,
@@ -17,6 +18,9 @@ export const wargame = createSlice({
     },
     setBalance: (state, action) => {
       state.balance = action.payload
+    },
+    setTime: (state, action) => {
+      state.time = action.payload
     },
     payPlayerRequest: (state, action) => {
       state.paying.isPaying = true
@@ -40,6 +44,7 @@ export const wargame = createSlice({
 export const { 
   setContract, 
   setBalance,
+  setTime,
   payPlayerRequest,
   payPlayerSuccess,
   payPlayerFail

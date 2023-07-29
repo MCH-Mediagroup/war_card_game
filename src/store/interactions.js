@@ -15,6 +15,7 @@ import {
 import { 
     setContract,
     setBalance,
+    setTime,
     payPlayerRequest,
     payPlayerSuccess,
     payPlayerFail
@@ -112,7 +113,13 @@ export const payPlayer = async (provider, wargame, amount,  dispatch) => {
   } catch (error) {
     dispatch(payPlayerFail())
   }
+}
 
+// ------------------------------------------------------------------------------
+// SET TIME
+export const saveGameTime = async ( time, dispatch) => {
+  dispatch(setTime(time))
 
 }
+
 

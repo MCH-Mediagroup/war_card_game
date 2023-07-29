@@ -18,6 +18,7 @@ import {
   loadWargame
 } from '../store/interactions';
 import TestCard from './TestCard';
+import TestTime from './TestTime';
 
 
 // ABIs: Import your contract ABIs here
@@ -75,6 +76,7 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/testcard" element={<TestCard />} />
+          <Route path="/testtime" element={<TestTime />} />
         </Routes>
 
       </HashRouter>

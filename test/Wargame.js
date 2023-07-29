@@ -70,7 +70,7 @@ describe('Wargame', () => {
 
     describe('Paying Players', () => {
       let transaction, result
-      let amount = tokens(50)
+      let amount = tokens(20)
 
       describe('Success', () => {
         beforeEach(async () => {
@@ -78,6 +78,11 @@ describe('Wargame', () => {
           // console.log("whitelisted record:", await crowdsale.whiteListed(user1.address))
           console.log(`Wargame contract Tokens before: ${await token.balanceOf(wargame.address)}\n`)
           transaction = await wargame.connect(user1).payPlayer(amount, { value: ether(0) })
+          result = await transaction.wait()
+          amount = tokens(30)
+          transaction = await token
+          .connect(wargame)
+          .transfer(user1.address, amount);
           result = await transaction.wait()
           console.log(`Wargame contract Tokens after: ${await token.balanceOf(wargame.address)}\n`)
           console.log(`Tokens transferred to player: ${await token.balanceOf(user1.address)}\n`)
