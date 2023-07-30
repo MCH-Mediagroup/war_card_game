@@ -7,18 +7,18 @@ const Tabs = () => {
       <LinkContainer to="/">
         <Nav.Link>War Card Game</Nav.Link>
       </LinkContainer>
-      <LinkContainer to="/admin">
+      {/* <LinkContainer to="/admin">
         <Nav.Link>Admin</Nav.Link>
       </LinkContainer>
       <LinkContainer to="/rewards">
         <Nav.Link>Rewards</Nav.Link>
-      </LinkContainer>
+      </LinkContainer> */}
       <LinkContainer to="/testcard">
         <Nav.Link>Test Card</Nav.Link>
       </LinkContainer>
-      <LinkContainer to="/testtime">
+      {/* <LinkContainer to="/testtime">
         <Nav.Link>Test Time</Nav.Link>
-      </LinkContainer>
+      </LinkContainer> */}
     </Nav>
   );
 }

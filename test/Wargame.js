@@ -70,7 +70,7 @@ describe('Wargame', () => {
 
     describe('Paying Players', () => {
       let transaction, result
-      let amount = tokens(20)
+      let amount = tokens(50)
 
       describe('Success', () => {
         beforeEach(async () => {
@@ -79,11 +79,11 @@ describe('Wargame', () => {
           console.log(`Wargame contract Tokens before: ${await token.balanceOf(wargame.address)}\n`)
           transaction = await wargame.connect(user1).payPlayer(amount, { value: ether(0) })
           result = await transaction.wait()
-          amount = tokens(30)
-          transaction = await token
-          .connect(wargame)
-          .transfer(user1.address, amount);
-          result = await transaction.wait()
+          // amount = tokens(30)
+          // transaction = await token
+          // .connect(wargame)
+          // .transfer(user1.address, amount);
+          // result = await transaction.wait()
           console.log(`Wargame contract Tokens after: ${await token.balanceOf(wargame.address)}\n`)
           console.log(`Tokens transferred to player: ${await token.balanceOf(user1.address)}\n`)
         })
@@ -120,27 +120,55 @@ describe('Wargame', () => {
   
     })
 
-    // describe('Sending ETH', () => {
-    //   let transaction, result
-    //   let amount = ether(50)
+    describe('Withdrawing Tokens from Player', () => {
+      let transaction, result
+      let amount = tokens(50)
   
-    //   describe('Success', () => {
+      describe('Success', () => {
   
-    //     beforeEach(async () => {
-    //       transaction = await user1.sendTransaction({ to: wargame.address, value: amount })
-    //       result = await transaction.wait()
-    //     })
+        beforeEach(async () => {
+          transaction = await wargame.connect(user1).payPlayer(amount, { value: ether(0) })
+          result = await transaction.wait()
+
+          console.log(`Wargame contract Tokens before: ${await token.balanceOf(wargame.address)}\n`)
+          console.log(`Tokens transferred to player: ${await token.balanceOf(user1.address)}\n`)
+
+          transaction = await token.connect(user1).approve(wargame.address, amount)
+          result = await transaction.wait()
+
+          transaction = await wargame.connect(user1).withdrawTokens(amount, { value: ether(0) })
+          result = await transaction.wait()
+
+          console.log(`Wargame contract Tokens after: ${await token.balanceOf(wargame.address)}\n`)
+          console.log(`Tokens left after Transfer from player: ${await token.balanceOf(user1.address)}\n`)
+
+        })
   
-    //     it('updates contracts ether balance', async () => {
-    //       expect(await ethers.provider.getBalance(wargame.address)).to.equal(amount)
-    //     })
+        // it('updates contracts player balance', async () => {
+        //   expect(await ethers.provider.getBalance(wargame.address)).to.equal(amount)
+        // })
   
-    //     it('updates user token balance', async () => {
-    //       expect(await token.balanceOf(user1.address)).to.equal(amount)
-    //     })
+        it('updates user token balance', async () => {
+          expect(await token.balanceOf(user1.address)).to.equal(0)
+        })
+
+        it('emits a withdraw Tokens event', async () => {
+          // --> https://hardhat.org/hardhat-chai-matchers/docs/reference#.emit
+          await expect(transaction).to.emit(wargame, "WithdrawTokens")
+            .withArgs(amount, user1.address)
+        })
+
+      })
+
+      describe('Failure', () => {
+
+        // it('rejects insufficent ETH', async () => {
+        //   await expect(wargame.connect(user1).payPlayer(tokens(50), { value: 0 })).to.be.reverted
+        // })
   
-    //   })
-    // })
+      })
+
+    })
 
     describe('Updating Price', () => {
       let transaction, result

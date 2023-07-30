@@ -73,10 +73,10 @@ function App() {
 
         <Routes>
           <Route exact path="/" element={<Wargame />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/rewards" element={<Rewards />} />
+          {/* <Route path="/admin" element={<Admin />} />
+          <Route path="/rewards" element={<Rewards />} /> */}
           <Route path="/testcard" element={<TestCard />} />
-          <Route path="/testtime" element={<TestTime />} />
+          {/* <Route path="/testtime" element={<TestTime />} /> */}
         </Routes>
 
       </HashRouter>

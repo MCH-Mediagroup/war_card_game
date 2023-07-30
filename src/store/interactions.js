@@ -15,10 +15,15 @@ import {
 import { 
     setContract,
     setBalance,
-    setTime,
+    setGameTime,
+    setSlowTime,
+    setPlayTime,
     payPlayerRequest,
     payPlayerSuccess,
-    payPlayerFail
+    payPlayerFail,
+    withdrawRequest,
+    withdrawSuccess,
+    withdrawFail
 } from './reducers/wargame'
 
 import TOKEN_ABI from '../abis/Token.json';
@@ -77,10 +82,10 @@ export const loadTokens = async (provider, chainId, dispatch) => {
 
 //------------------------------------------------------------------------------
 // LOAD BALANCE 
-export const loadBalances = async (token, account, dispatch) => {
+export const loadBalances = async (tokens, account, dispatch) => {
     // const tokenBalance = await tokens[0].balanceOf(account)
     // const token = new ethers.Contract(config[chainId].token.address, TOKEN_ABI, provider)
-    const balance1 = await token.balanceOf(account)
+    const balance1 = await tokens.balanceOf(account)
     //const wargameBalance = ethers.utils.formatUnits(await token.balanceOf(wargame), 18)
   
     dispatch(balancesLoaded([
@@ -89,7 +94,7 @@ export const loadBalances = async (token, account, dispatch) => {
 
   }
 // ------------------------------------------------------------------------------
-// ADD LIQUDITY
+// Pay Player
 export const payPlayer = async (provider, wargame, amount,  dispatch) => {
   try {
     dispatch(payPlayerRequest())
@@ -114,11 +119,51 @@ export const payPlayer = async (provider, wargame, amount,  dispatch) => {
     dispatch(payPlayerFail())
   }
 }
+// ------------------------------------------------------------------------------
+// Withdraw Tokens from Player
+export const withdrawTokens = async (provider, wargame, tokens, amount, dispatch) => {
+  try {
+    dispatch(withdrawRequest())
+
+    const signer = await provider.getSigner()
+
+    let transaction
+
+    transaction = await tokens[0].connect(signer).approve(wargame.address, amount)
+    await transaction.wait()
+
+    const formattedAmount = ethers.utils.parseUnits(amount.toString(), 'ether')
+
+    transaction = await wargame.connect(signer).withdrawTokens(formattedAmount, { value: 0 })
+    await transaction.wait()
+
+    dispatch(withdrawSuccess(transaction.hash))
+
+  } catch (error) {
+    dispatch(withdrawFail())
+  }
+
+
+}
+
+
 
 // ------------------------------------------------------------------------------
-// SET TIME
+// SET GAME TIME
 export const saveGameTime = async ( time, dispatch) => {
-  dispatch(setTime(time))
+  dispatch(setGameTime(time))
+
+}
+// ------------------------------------------------------------------------------
+// SET SLOW TIME
+export const saveSlowTime = async ( time, dispatch) => {
+  dispatch(setSlowTime(time))
+
+}
+// ------------------------------------------------------------------------------
+// SET PLAY TIME
+export const savePlayTime = async ( time, dispatch) => {
+  dispatch(setPlayTime(time))
 
 }
 

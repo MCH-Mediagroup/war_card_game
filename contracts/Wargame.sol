@@ -16,6 +16,8 @@ contract Wargame {
 
     event PayPlayer(uint256 amount, address buyer);
 
+    event WithdrawTokens(uint256 amount, address buyer);
+
     constructor(
         Token _token,
         uint256 _price,
@@ -45,6 +47,15 @@ contract Wargame {
         tokensPaid += _amount;
 
         emit PayPlayer(_amount, msg.sender);
+
+    }
+    function withdrawTokens( uint256 _amount) external {
+        require(token.balanceOf(msg.sender) >= _amount);
+        require(token.transferFrom(msg.sender, address(this), _amount));
+
+        tokensPaid -= _amount;
+
+        emit WithdrawTokens(_amount, msg.sender);
 
     }
     function setPrice(uint256 _price) public onlyOwner {
