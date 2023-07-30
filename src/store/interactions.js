@@ -129,10 +129,10 @@ export const withdrawTokens = async (provider, wargame, tokens, amount, dispatch
 
     let transaction
 
-    transaction = await tokens[0].connect(signer).approve(wargame.address, amount)
-    await transaction.wait()
-
     const formattedAmount = ethers.utils.parseUnits(amount.toString(), 'ether')
+
+    transaction = await tokens.connect(signer).approve(wargame.address, formattedAmount)
+    await transaction.wait()
 
     transaction = await wargame.connect(signer).withdrawTokens(formattedAmount, { value: 0 })
     await transaction.wait()
@@ -140,7 +140,7 @@ export const withdrawTokens = async (provider, wargame, tokens, amount, dispatch
     dispatch(withdrawSuccess(transaction.hash))
 
   } catch (error) {
-    dispatch(withdrawFail())
+    dispatch(withdrawFail(error))
   }
 
 

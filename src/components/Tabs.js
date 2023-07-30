@@ -16,9 +16,9 @@ const Tabs = () => {
       <LinkContainer to="/testcard">
         <Nav.Link>Test Card</Nav.Link>
       </LinkContainer>
-      {/* <LinkContainer to="/testtime">
+      <LinkContainer to="/testtime">
         <Nav.Link>Test Time</Nav.Link>
-      </LinkContainer> */}
+      </LinkContainer>
     </Nav>
   );
 }

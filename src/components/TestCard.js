@@ -17,6 +17,7 @@ import Alert from './Alert'
 import {
   payPlayer,
   loadBalances,
+  loadAccount,
   withdrawTokens
 } from '../store/interactions'
 
@@ -33,6 +34,14 @@ const TestCard = () => {
   const gametime = useSelector(state => state.wargame.gametime)
   const slowtime = useSelector(state => state.wargame.slowtime)
   const playtime = useSelector(state => state.wargame.playtime)
+  const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
+  const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
+  const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
+  const error = useSelector(state => state.wargame.withdrawing.error)
+  const isPaying = useSelector(state => state.wargame.paying.isWithdrawing)
+  const isSuccessPaying = useSelector(state => state.wargame.paying.isSuccess)
+  const payTransactionHash = useSelector(state => state.wargame.paying.transactionHash)
+
   
   // const [gameTime, setGameTime] = useState(0)
   const [firstRun, setFirstRun] = useState(true)
@@ -41,29 +50,22 @@ const TestCard = () => {
 
   const [showAlert, setShowAlert] = useState(false)
 
-  const [accountBalance, setAccountBalance] = useState(0)
 
-  let [playerTokens, setPlayerTokens] = useState(50)
-  let [gameTokens, setGameTokens] = useState(50)
-  let [tokensPaid, setTokensPaid] = useState(50)
-  const [tokenAmount, setTokenAmount] = useState(0)
-  // const [timerTime, setTimerTime] = React.useState(Date.now() + MINUTES_TO_ADD);
+  let [playerTokens, setPlayerTokens] = useState(0)
+  let [gameTokens, setGameTokens] = useState(0)
+  let [tokenAmount, setTokenAmount] = useState(0)
+  let [tokenMultiplier, setTokenMultiplier] = useState(1)
 
 
 
   const dispatch = useDispatch()
       // Fetch Countdown
-    // For Testing
-    let isBegun = true;
-    const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
+  const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
 
 
   const loadInitialData = async () => {
 
-    // setTokensPaid(ethers.utils.formatUnits(await wargame.tokensPaid(), 18))
-
     console.log(`Total Game Tokens available: ${wargameBalance}\n`)
-
 
 }
 useEffect(() => {
@@ -77,21 +79,34 @@ const isBettingHandler = async () => {
 const cancelBetHandler = async () => {
   setIsBetting(false)
 }
-const betHandler = async () => {
-  // e.preventDefault()
-  const _tokenAmount = ethers.utils.parseUnits(tokenAmount, 'ether')
+const betHandler = async (e) => {
+  e.preventDefault()
+  setShowAlert(false)
+  
 
-  await withdrawTokens(provider, wargame, tokens, _tokenAmount, dispatch)
+
+  console.log(`TokenAmount : ${tokenAmount}\n`)
+
+
+  console.log(`Account : ${account}\n`)
+
+  await withdrawTokens(provider, wargame, tokens, tokenAmount, dispatch)
 
   await loadBalances(tokens, account, dispatch)
 
-  setGameTokens(_tokenAmount * 2)
+  setGameTokens(Number(tokenAmount))
 
-  console.log(`Game Tokens betting : ${gameTokens}\n`)
+  setTokenMultiplier(2)
+  tokenMultiplier = 2
+
+  console.log(`Game Tokens betting : ${gameTokens} with multiplier: ${tokenMultiplier}\n`)
 
   setPlayerTokens(0)
 
   setHasBet(true)
+
+  setShowAlert(true)
+
 
 }
 
@@ -107,29 +122,34 @@ const handleStartClick = () => {
 };
 const payPlayerHandler = async () => {
   // e.preventDefault()
+
   console.log(`Game Tokens before: ${gameTokens}\n`)
   console.log(`Player Tokens before: ${playerTokens}\n`)
+  console.log(`Token multiplier before: ${tokenMultiplier}\n`)
 
 
   setShowAlert(false)
-  console.log(`First Run: ${firstRun}\n`)
+  // console.log(`First Run: ${firstRun}\n`)
 
-  const testWinState = Math.floor(Math.random() * 4);
+  let testWinState = Math.floor(Math.random() * 4);
+
+  // testWinState = 1  // testing
 
   let totalTokensWon = 0;
 
   switch( testWinState ) {
     case 1: // Win before timer expires
-      totalTokensWon = gameTokens + 100;
+      totalTokensWon = (gameTokens + 100) * tokenMultiplier;
       break;
     case 2: // Win after timer expires
-      totalTokensWon = gameTokens + 50;
+      totalTokensWon = (gameTokens + 50) * tokenMultiplier;
       break;
     case 3: // Draw
       totalTokensWon = gameTokens;
       break;
     default: // Lose
-    totalTokensWon = 0;
+      totalTokensWon = 0;
+      break
   }
 
   setPlayerTokens(totalTokensWon)
@@ -153,16 +173,18 @@ const payPlayerHandler = async () => {
   await loadBalances(tokens, account, dispatch)
 
 // reset player tokens
-// setPlayerTokens(50)
-// setGameTokens(50)
-// playerTokens = 50
-// gameTokens = 50
+setPlayerTokens(0)
+setGameTokens(0)
+playerTokens = 0
+gameTokens = 0
+setTokenAmount(0)
+setTokenMultiplier(1)
+
+setIsBetting(false)
+setHasBet(false)
+setFirstRun(true)
+
 console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
-
-//setTokensPaid(ethers.utils.formatUnits(await wargame.tokensPaid(), 18))
-// setGameTime(gameOn.toString() + '000')
-
-handleStartClick()
 
 setShowAlert(true)
 
@@ -190,9 +212,6 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
     );
   }
 };
-
-
-
       
       return (
         <div>
@@ -228,20 +247,18 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
                             </InputGroup>
                         </Row>
                         <Row>
-                          <Button className='m-2'>Go For It!</Button>
+                          <Button type="submit" className='m-2'>Go For It!</Button>
                           <Button onClick={cancelBetHandler} className='m-2'>Cancel</Button>
                         </Row>
                     </>
                     }
                     {!isBetting && !hasBet && <Button  onClick={isBettingHandler} className='m-2'>Bet your {symbols} Tokens?</Button>}
-                    {hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens!</h3>}
+                    {hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>}
                   </Form>
                 </Col>
                 <Col>
-                {/* <p className='text-center'><strong>Total Token Balance:</strong> {balance} ETH</p> */}
                 <p className='text-center'><strong>Your {symbols} Total Balance:</strong> {playerBalance} {symbols}</p>
                 <p className='text-center'><strong>Number of Tokens to play with:</strong> {playerTokens} {symbols}</p>
-                {/* <p className='text-center my-3'>{tokensPaid} / {balance} Tokens paid</p> */}
                 
                 </Col>
               </Row>
@@ -266,6 +283,31 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
 
             )
           }
+              {isPaying || isWithdrawing ? (
+                <Alert
+                message={'Transaction Pending...'}
+                transactionHash={null}
+                variant={'info'}
+                setShowAlert={setShowAlert}
+                />
+            ) : (isSuccessPaying || isSuccess) && showAlert ? (
+                <Alert
+                message={'Transaction Successful'}
+                transactionHash={payTransactionHash}
+                variant={'success'}
+                setShowAlert={setShowAlert}
+                />
+            ) : (!isSuccessPaying || !isSuccess) && showAlert ? (
+                <Alert
+                message={'Transaction Failed'}
+                transactionHash={null}
+                variant={'danger'}
+                setShowAlert={setShowAlert}
+                />
+            ) : (
+                <></>
+      )}
+
         </div>
       )
 }

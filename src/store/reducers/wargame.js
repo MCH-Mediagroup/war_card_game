@@ -16,7 +16,8 @@ export const wargame = createSlice({
     withdrawing: {
       isWithdrawing: false,
       isSucccess: false,
-      transactionHash: null
+      transactionHash: null,
+      error: null
     },
 
   },
@@ -64,7 +65,7 @@ export const wargame = createSlice({
     withdrawFail: (state, action) => {
       state.withdrawing.isWithdrawing = false
       state.withdrawing.isSuccess = false
-      state.withdrawing.transactionHash = null
+      state.withdrawing.transactionHash = action.payload
     }
   }
 })

@@ -39,7 +39,7 @@ contract Token {
         public
         returns (bool success)
     {
-        require(balanceOf[msg.sender] >= _value);
+        require(balanceOf[msg.sender] >= _value, "Balance not >= amount on transfer attempt");
 
         _transfer(msg.sender, _to, _value);
 
@@ -51,7 +51,7 @@ contract Token {
         address _to,
         uint256 _value
     ) internal {
-        require(_to != address(0));
+        require(_to != address(0), "Invalid _to address on transfer attempt");
 
         balanceOf[_from] = balanceOf[_from] - _value;
         balanceOf[_to] = balanceOf[_to] + _value;
@@ -63,7 +63,7 @@ contract Token {
         public
         returns(bool success)
     {
-        require(_spender != address(0));
+        require(_spender != address(0), "Owner address same as spender on approval attempt");
 
         allowance[msg.sender][_spender] = _value;
 
@@ -79,8 +79,8 @@ contract Token {
         public
         returns (bool success)
     {
-        require(_value <= balanceOf[_from]);
-        require(_value <= allowance[_from][msg.sender]);
+        require(_value <= balanceOf[_from], "Balance not >= amount on transferFrom attempt");
+        require(_value <= allowance[_from][msg.sender], "Transfer amount <= allowance");
 
         allowance[_from][msg.sender] = allowance[_from][msg.sender] - _value;
 

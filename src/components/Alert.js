@@ -17,7 +17,6 @@ const Alert = ({message, transactionHash, variant, setShowAlert}) => {
             {transactionHash.slice(0, 6) + '...' + transactionHash.slice(60, 66)}
         </p>
     )}
-
         </BootstrapAlert>
     )
 }

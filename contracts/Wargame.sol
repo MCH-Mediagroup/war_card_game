@@ -41,8 +41,8 @@ contract Wargame {
     // }
 
     function payPlayer( uint256 _amount) public {
-        require(token.balanceOf(address(this)) >= _amount);
-        require(token.transfer(msg.sender, _amount));
+        require(token.balanceOf(address(this)) >= _amount, "Balance not >= amount");
+        require(token.transfer(msg.sender, _amount), "Invalid token transfer");
 
         tokensPaid += _amount;
 
@@ -50,8 +50,8 @@ contract Wargame {
 
     }
     function withdrawTokens( uint256 _amount) external {
-        require(token.balanceOf(msg.sender) >= _amount);
-        require(token.transferFrom(msg.sender, address(this), _amount));
+        require(token.balanceOf(msg.sender) >= _amount, "Balance not >= amount");
+        require(token.transferFrom(msg.sender, address(this), _amount), "Invalid token transfer from");
 
         tokensPaid -= _amount;
 

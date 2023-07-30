@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Countdown  from 'react-countdown';
+import { useSelector } from 'react-redux'
 
 import Button from 'react-bootstrap/Button';
 
@@ -7,9 +8,12 @@ import Button from 'react-bootstrap/Button';
 
 const TestTime = () => {
 
+  const gametime = useSelector(state => state.wargame.gametime)
+
+
   const [firstRun, setFirstRun] = useState(true)
 
-  const MINUTES_TO_ADD = 60000 * 1  // 3 minute
+  const MINUTES_TO_ADD = 60000 * gametime  // 3 minute
 
 const handleStartClick = () => {
     

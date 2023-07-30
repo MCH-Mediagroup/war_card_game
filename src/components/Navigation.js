@@ -8,7 +8,7 @@ import Blockies from 'react-blockies'
 
 import logo from '../logo.png';
 
-import { loadAccount, loadBalances, saveGameTime } from '../store/interactions'
+import { loadAccount, loadBalances } from '../store/interactions'
 
 import config from '../config.json'
 
@@ -16,23 +16,15 @@ const Navigation = () => {
   const chainId = useSelector(state => state.provider.chainId)
   const account = useSelector(state => state.provider.account)
   const tokens = useSelector(state => state.tokens.contracts)
-  const wargame = useSelector(state => state.wargame.contract)
-  const gametimes = useSelector(state => state.wargame.time)
-  const [gameTime, setGameTime] = useState(0)
 
 
   const dispatch = useDispatch()
 
   const connectHandler = async () => {
     const account = await loadAccount(dispatch)
-        const MINUTES_TO_ADD = 60000 * 10  // 3 minute
-        let GAME_TIMER = (new Date().getTime() + (MINUTES_TO_ADD)).toString().slice(0, 10);
-        setGameTime(GAME_TIMER.toString() + '000')
-
-        saveGameTime(gameTime, dispatch)
-    
+   
         await loadBalances(tokens, account, dispatch)
-      }
+  }
 
   const networkHandler = async (e) => {
     await window.ethereum.request({
