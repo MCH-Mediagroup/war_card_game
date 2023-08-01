@@ -14,8 +14,8 @@ const tokens = (n) => {
 const ether = tokens
 
 async function main() {
-  let NAME = 'MCH Media Group'
-  let SYMBOL = 'MCHT'
+  let NAME = 'MCH War Card Game'
+  let SYMBOL = 'WARCARDS'
   let MAX_SUPPLY = '1000000'
   //const PRICE = ethers.utils.parseUnits('0.025', 'ether')
   const COST = ethers.utils.parseUnits("1", "ether") // 1 ETH

@@ -13,17 +13,21 @@ import Spinner from 'react-bootstrap/Spinner';
 import { ethers } from 'ethers'
 
 import Alert from './Alert'
-import './War.css';
+import Game from './Game'
+import GameStatus from './GameStatus';
 
 import {
   payPlayer,
   loadBalances,
   loadAccount,
-  withdrawTokens
+  withdrawTokens,
+  saveGameOver,
+  savePlayGame,
+  saveWinStatus
 } from '../store/interactions'
 
 
-const TestCard = () => {
+const TestGame = () => {
   const provider = useSelector(state => state.provider.connection)
   const account = useSelector(state => state.provider.account)
 
@@ -33,39 +37,41 @@ const TestCard = () => {
   const wargameBalance = useSelector(state => state.wargame.balance)
   const playerBalance = useSelector(state => state.tokens.balances)
   const gametime = useSelector(state => state.wargame.gametime)
-  const slowtime = useSelector(state => state.wargame.slowtime)
-  const playtime = useSelector(state => state.wargame.playtime)
+  const playgame = useSelector(state => state.wargame.playgame)
+  const gameover = useSelector(state => state.wargame.gameover)
+  const winstatus = useSelector(state => state.wargame.winstatus)
+  let player1cards = useSelector(state => state.wargame.player1cards)
+  let player2cards = useSelector(state => state.wargame.player2cards)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
-  const error = useSelector(state => state.wargame.withdrawing.error)
   const isPaying = useSelector(state => state.wargame.paying.isWithdrawing)
   const isSuccessPaying = useSelector(state => state.wargame.paying.isSuccess)
   const payTransactionHash = useSelector(state => state.wargame.paying.transactionHash)
 
-  
   const [dateTime, setDateTime] = useState(0)
-  let [firstRun, setFirstRun] = useState(true)
-  let [showCardDeck, setShowCardDeck] = useState(false)
+
+  // const [gameTime, setGameTime] = useState(0)
+  // const [firstRun, setFirstRun] = useState(true)
   const [isBetting, setIsBetting] = useState(false)
   const [hasBet, setHasBet] = useState(false)
 
   const [showAlert, setShowAlert] = useState(false)
 
 
+  let [player1Cards, setPlayer1Cards] = useState(0)
+  let [player2Cards, setPlayer2Cards] = useState(0)
   let [playerTokens, setPlayerTokens] = useState(0)
   let [gameTokens, setGameTokens] = useState(0)
   let [tokenAmount, setTokenAmount] = useState(0)
   let [tokenMultiplier, setTokenMultiplier] = useState(1)
-  let [winState, setWinState] = useState(0)
 
+  let [data, setCards] = useState([])
 
 
   const dispatch = useDispatch()
       // Fetch Countdown
   const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
-
-  let [data, setCards] = useState([])
 
   const fetchCardData = () => {
     fetch("http://192.168.254.133:5050/api/Cards/getcards")
@@ -81,13 +87,15 @@ const TestCard = () => {
         fetchCardData()
     }, []);
 
-
-
   const loadInitialData = async () => {
 
     console.log(`Total Game Tokens available: ${wargameBalance}\n`)
 
 }
+// useEffect(() => {
+//    loadInitialData()
+   
+// }, []);
 
 const isBettingHandler = async () => {
   setIsBetting(true)
@@ -131,17 +139,19 @@ const amountHandler = async (e) => {
 }
 
 const handleStartClick = () => {
-  setShowCardDeck(true)
-  setDateTime(Date.now() + (MINUTES_TO_ADD))
-
+ 
   // if (firstRun){
   //     setFirstRun(false);
-  //     fetchCardData()
-
-  //     dealCards(cards);
-
+  //     setDateTime(Date.now() + (MINUTES_TO_ADD))
   //   }
+
 };
+const savePlayer1CardsHandler = (player1Score) => {
+  setPlayer1Cards(player1Score)
+}
+const savePlayer2CardsHandler = (player2Score) => {
+  setPlayer2Cards(player2Score)
+}
 const payPlayerHandler = async () => {
   // e.preventDefault()
 
@@ -154,12 +164,12 @@ const payPlayerHandler = async () => {
   // console.log(`First Run: ${firstRun}\n`)
 
   let testWinState = Math.floor(Math.random() * 4);
-  //setWinState(testWinState)
-  winState = testWinState
+
+  // testWinState = 1  // testing
 
   let totalTokensWon = 0;
 
-  switch( winState ) {
+  switch( testWinState ) {
     case 1: // Win before timer expires
       totalTokensWon = (gameTokens + 100) * tokenMultiplier;
       break;
@@ -176,7 +186,7 @@ const payPlayerHandler = async () => {
 
   setPlayerTokens(totalTokensWon)
   playerTokens = totalTokensWon
-  console.log(`Winning State: ${winState}\n`)
+  console.log(`Winning State: ${testWinState}\n`)
   console.log(`Total Player Tokens won: ${playerTokens}\n`)
   console.log(`Total Tokens won: ${totalTokensWon}\n`)
 
@@ -204,14 +214,46 @@ setTokenMultiplier(1)
 
 setIsBetting(false)
 setHasBet(false)
-setFirstRun(true)
-setWinState(0)
+// setFirstRun(true)
 
 console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
 
 setShowAlert(true)
 
 }
+
+const Completionist = () => <strong>Game Over!</strong>;
+
+// Renderer callback with condition
+const renderer = ({ days, hours, minutes, seconds, completed }) => {
+  if (completed) {
+  //   saveGameOver(true, dispatch)
+  //   saveWinStatus (
+  //     (player1cards > player2cards) ? (
+  //         2
+  //     ) : player1cards === player2cards ? (
+  //         3
+  //     ) : 0
+  // )
+
+    // Render a completed state
+    return (
+      <div className='h2' >
+    <Completionist />
+   
+  </div>)
+  } else {
+    // Render a countdown
+    return (
+      <div className='h2'>
+      <strong>You have: </strong>
+      <strong>{minutes} Minutes : {seconds} Seconds </strong>
+      <strong>to finish! </strong>
+    </div>
+    );
+  }
+};
+      // Cards Game below this comment
 
     // Cards Game below this comment
     //  The cards from the API is called randomCards
@@ -223,8 +265,8 @@ setShowAlert(true)
         [],
         []
     ];
-    // var firstRun = true;
-    var gameover = false;
+    var firstRun = true;
+    //var gameover = false;
     var timer;
     var r = 0;
     // var fightButton = document.querySelector("#btnBattle");
@@ -261,11 +303,9 @@ setShowAlert(true)
                     }
                 }
                 if (firstRun) {
-                    //setFirstRun(false);
                     firstRun = false;
                     // buildCards();
                     // shuffleArray(cards);
-                    fetchCardData()
                     dealCards(cards);
                 }
                 attack();
@@ -292,17 +332,24 @@ setShowAlert(true)
     
             function checkWinner(card1, card2, pot) {
                 if ((players[0].length <= 4) || (players[1].length <= 4)) {
-                    gameover = true;
-                    setWinState((players[1].length <= 4) ? 1 : 0 )
-                    payPlayerHandler();
+                    // gameover = true;
+                    saveGameOver(true, dispatch)
+                    saveWinStatus (
+                        (players[1].length <= 4) ? (
+                            1
+                        ) : players[1].length === players[0].length ? (
+                            3
+                        ) : 0
+                    )
+
                     return;
                 }
                 if (card1.cardValue > card2.cardValue) {
-                    outputMessage("Player wins");
+                    outputMessage("Player 1 wins");
                     players[0] = players[0].concat(pot);
                 }
                 else if (card1.cardValue < card2.cardValue) {
-                    outputMessage("House wins");
+                    outputMessage("Player 2 wins");
                     players[1] = players[1].concat(pot);
                 } else {
                     battlemode(pot);
@@ -339,7 +386,23 @@ setShowAlert(true)
                 bCard += '<div class="cardbottom suit">' + c.num + '<br></div></div>';
                 return bCard;
             }
-   
+    
+            // function buildCards() {
+            //     cards = [];
+            //     for (var s in suits) {
+            //         var suitNew = suits[s][0].toUpperCase();
+            //         for (var n in cardFace) {
+            //             var card = {
+            //                 suit: suits[s],
+            //                 num: cardFace[n],
+            //                 cardValue: parseInt(n) + 2,
+            //                 icon: suitNew
+            //             }
+            //             cards.push(card);
+            //         }
+            //     }
+            // }
+    
             function dealCards(array) {
                 for (var i = 0; i < array.length; i++) {
                     var m = i % 2;
@@ -347,44 +410,30 @@ setShowAlert(true)
                 }
             }
     
+            // function shuffleArray(array) {
+            //     for (var x = array.length - 1; x > 0; x--) {
+            //         var ii = Math.floor(Math.random() * (x + 1));
+            //         var temp = array[x];
+            //         array[x] = array[ii];
+            //         array[ii] = temp;
+            //     }
+            //     return array;
+            // }
 
-const Completionist = () => <strong>Game Over!</strong>;
-
-// Renderer callback with condition
-const renderer = ({ days, hours, minutes, seconds, completed }) => {
-  if (completed) {
-    gameover = true
-    winState = (players[1].length >= players[0].length) ? 2 : 0 
-    if (players[1].length === players[0].length){
-            winState = 3}
-
-    outputMessage("Game over");
-    payPlayerHandler();
-    // Render a completed state
-    return (
-      <div className='h2' >
-    <Completionist />
-   
-  </div>)
-  } else {
-    // Render a countdown
-    return (
-      <div className='h2'>
-      <strong>You have: </strong>
-      <strong>{minutes} Minutes : {seconds} Seconds </strong>
-      <strong>to finish! </strong>
-    </div>
-    );
-  }
-};
-      
+    
       return (
         <div>
           {account ? (
             <>
               <h1 className='my-4 text-center'>Let's Play War!</h1>
               <div className='my-4 text-center'>
-                {showCardDeck && <Countdown date={dateTime} className='h2' autoStart={true} renderer={renderer} />} <br />
+                {!firstRun && 
+               <Countdown date={dateTime} className='h2' autoStart={true} renderer={renderer} />
+                //  !gameover ? (<Countdown date={dateTime} className='h2' autoStart={true} renderer={renderer} />
+                //              ) : (
+                //                <h2>Game Over!</h2>
+                //              )
+                } <br />
               </div>
               <Row>
                 <Col>
@@ -472,31 +521,30 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
             ) : (
                 <></>
       )}
-        {showCardDeck &&
-          <div id="wrapper">
-              <div id="message">Click Fight to Start Game</div>
-              <div id="board">
-                  <div id="player1" className="players">
-                      <div>SCORE:<span className="score"></span></div>
-                      <div className="hand" ></div>
-                  </div>
-                  <div id="player2" className="players">
-                      <div>SCORE:<span className="score"></span></div>
-                      <div className="hand" ></div>
-                  </div>
-                  <div id="action">
-                  <Button  onClick={battle}>Fight</Button>
+        <GameStatus />
+        <div id="wrapper">
+    <div id="message">Click Fight to Start Game</div>
+    <div id="board">
+        <div id="player1" className="players">
+            <div>SCORE:<span className="score"></span></div>
+            <div className="hand" ></div>
+        </div>
+        <div id="player2" className="players">
+            <div>SCORE:<span className="score"></span></div>
+            <div className="hand" ></div>
+        </div>
+        <div id="action">
+            {!gameover && <Button  onClick={battle}>Fight</Button>}
+        </div>
+    </div>
+</div>
 
-                      {/* <button id="btnBattle" type="button" className="btn">Fight</button> */}
+        {/* <Game onSavePlayer1Cards={savePlayer1CardsHandler} onSavePlayer2Cards={savePlayer2CardsHandler}/> */}
 
-                  </div>
-              </div>
-          </div>
-        }
         </div>
       )
 }
 
 
 
-export default TestCard;
+export default TestGame

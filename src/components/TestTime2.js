@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import CountdownTimer from './CountdownTimer';
+import Countdown  from 'react-countdown';
 import { useSelector } from 'react-redux'
 
 import Button from 'react-bootstrap/Button';
 
 
 
-const TestTime = () => {
+const TestTime2 = () => {
 
   const gametime = useSelector(state => state.wargame.gametime)
 
@@ -58,7 +58,7 @@ const handleStartClick = () => {
       return (
         <>
           <div className='my-4 text-center'>
-                {!firstRun && <CountdownTimer targetDate={dateTime} />} <br />
+                {!firstRun && <Countdown date={dateTime} className='h2' autoStart={true} renderer={renderer} />} <br />
           </div>
           <Button  onClick={handleStartClick}>Simulate Play</Button>
 
@@ -69,4 +69,4 @@ const handleStartClick = () => {
 
 
 
-export default TestTime;
+export default TestTime2;

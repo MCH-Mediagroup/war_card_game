@@ -5,9 +5,14 @@ export const wargame = createSlice({
   initialState: {
     contract: null,
     balance: 0,
-    gametime: 3, // Game time in minutes
+    gametime: 1, // Game time in minutes
     slowtime: 2, // Amount of seconds to slow game down
     playtime: 6, // Amount of seconds before game automatically plays
+    playgame: false, 
+    gameover: false,
+    winstatus: 0,
+    player1cards: 26,
+    player2cards: 26,
     paying: {
       isPaying: false,
       isSucccess: false,
@@ -16,8 +21,7 @@ export const wargame = createSlice({
     withdrawing: {
       isWithdrawing: false,
       isSucccess: false,
-      transactionHash: null,
-      error: null
+      transactionHash: null
     },
 
   },
@@ -36,6 +40,21 @@ export const wargame = createSlice({
     },
     setPlayTime: (state, action) => {
       state.playtime = action.payload
+    },
+    setPlayGame: (state, action) => {
+      state.playgame = action.payload
+    },
+    setGameOver: (state, action) => {
+      state.gameover = action.payload
+    },
+    setWinStatus: (state, action) => {
+      state.winstatus = action.payload
+    },
+    setPlayer1Cards: (state, action) => {
+      state.player1cards = action.payload
+    },
+    setPlayer2Cards: (state, action) => {
+      state.player2cards = action.payload
     },
     payPlayerRequest: (state, action) => {
       state.paying.isPaying = true
@@ -76,6 +95,11 @@ export const {
   setGameTime,
   setSlowTime,
   setPlayTime,
+  setPlayGame,
+  setGameOver,
+  setWinStatus,
+  setPlayer1Cards,
+  setPlayer2Cards,
   payPlayerRequest,
   payPlayerSuccess,
   payPlayerFail,

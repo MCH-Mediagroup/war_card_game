@@ -23,7 +23,7 @@ describe('Wargame', () => {
       const Token = await ethers.getContractFactory('Token')
 
       // Deploy token
-      token = await Token.deploy('MCH Media Group', 'MCHT', '1000000')
+      token = await Token.deploy('MCH War Card Game', 'WARCARDS', '1000000')
 
       // Configure Accounts
       accounts = await ethers.getSigners()
