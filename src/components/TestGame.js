@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 
-import Countdown from 'react-countdown';
+import DateTimeDisplay from './DateTimeDisplay';
+import { useCountdown } from '../hooks/useCountdown';
 
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
@@ -38,10 +39,10 @@ const TestGame = () => {
   const playerBalance = useSelector(state => state.tokens.balances)
   const gametime = useSelector(state => state.wargame.gametime)
   const playgame = useSelector(state => state.wargame.playgame)
-  const gameover = useSelector(state => state.wargame.gameover)
+  //const gameover = useSelector(state => state.wargame.gameover)
   const winstatus = useSelector(state => state.wargame.winstatus)
-  let player1cards = useSelector(state => state.wargame.player1cards)
-  let player2cards = useSelector(state => state.wargame.player2cards)
+  // let player1cards = useSelector(state => state.wargame.player1cards)
+  // let player2cards = useSelector(state => state.wargame.player2cards)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
@@ -52,12 +53,16 @@ const TestGame = () => {
   const [dateTime, setDateTime] = useState(0)
 
   // const [gameTime, setGameTime] = useState(0)
-  // const [firstRun, setFirstRun] = useState(true)
+  let [beginGame, setBeginGame] = useState(true)
   const [isBetting, setIsBetting] = useState(false)
   const [hasBet, setHasBet] = useState(false)
 
   const [showAlert, setShowAlert] = useState(false)
 
+  let [timerExpired, setTimerExpired] = useState(false)
+  let [gameover, setGameOver] = useState(false)
+
+  let [winState, setWinState] = useState(0)
 
   let [player1Cards, setPlayer1Cards] = useState(0)
   let [player2Cards, setPlayer2Cards] = useState(0)
@@ -71,8 +76,8 @@ const TestGame = () => {
 
   const dispatch = useDispatch()
       // Fetch Countdown
-  const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
-
+  // const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
+  const MINUTES_TO_ADD = 60000 * .25  // testing
   const fetchCardData = () => {
     fetch("http://192.168.254.133:5050/api/Cards/getcards")
       .then(res => res.json())
@@ -140,10 +145,11 @@ const amountHandler = async (e) => {
 
 const handleStartClick = () => {
  
-  // if (firstRun){
-  //     setFirstRun(false);
-  //     setDateTime(Date.now() + (MINUTES_TO_ADD))
-  //   }
+  if (beginGame){
+      setBeginGame(false);
+      setDateTime(Date.now() + (MINUTES_TO_ADD))
+      // dealCards(cards);
+    }
 
 };
 const savePlayer1CardsHandler = (player1Score) => {
@@ -152,6 +158,19 @@ const savePlayer1CardsHandler = (player1Score) => {
 const savePlayer2CardsHandler = (player2Score) => {
   setPlayer2Cards(player2Score)
 }
+const timerExpiredHandler = () => {
+  if (!timerExpired)
+  {
+    timerExpired = true
+    gameover = true
+    winState = 1
+    console.log(`Timer Expired winState: ${winState}\n`)
+    console.log(`Player1 Cards: ${player1Cards}\n`)
+    console.log(`Player2 Cards: ${player2Cards}\n`)
+
+  }
+}
+
 const payPlayerHandler = async () => {
   // e.preventDefault()
 
@@ -222,44 +241,8 @@ setShowAlert(true)
 
 }
 
-const Completionist = () => <strong>Game Over!</strong>;
-
-// Renderer callback with condition
-const renderer = ({ days, hours, minutes, seconds, completed }) => {
-  if (completed) {
-  //   saveGameOver(true, dispatch)
-  //   saveWinStatus (
-  //     (player1cards > player2cards) ? (
-  //         2
-  //     ) : player1cards === player2cards ? (
-  //         3
-  //     ) : 0
-  // )
-
-    // Render a completed state
-    return (
-      <div className='h2' >
-    <Completionist />
-   
-  </div>)
-  } else {
-    // Render a countdown
-    return (
-      <div className='h2'>
-      <strong>You have: </strong>
-      <strong>{minutes} Minutes : {seconds} Seconds </strong>
-      <strong>to finish! </strong>
-    </div>
-    );
-  }
-};
-      // Cards Game below this comment
-
     // Cards Game below this comment
-    //  The cards from the API is called randomCards
 
-    // var suits = ["spades", "hearts", "clubs", "diams"];
-    // var cardFace = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
     var cards = data;
     var players = [
         [],
@@ -276,23 +259,8 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
     var s1 = document.querySelector("#player1 .score");
     var s2 = document.querySelector("#player2 .score");
 
-    //event listeners
-    // fightButton.addEventListener('click', battle);
-    // fightButton10.addEventListener('click', function () {
-    //     rounds(10);
-    // });
-    // fightButton50.addEventListener('click', function () {
-    //     rounds(50);
-    // });
-
     
               //functions
-            //   function rounds(a) {
-            //     r = a;
-            //     timer = setInterval(function () {
-            //         battle()
-            //     }, 100);
-            // }
     
             function battle() {
                 if (timer) {
@@ -321,6 +289,8 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
                     checkWinner(card1, card2, pot);
                     s1.innerHTML = players[0].length; 
                     s2.innerHTML = players[1].length; 
+                    player1Cards = players[0].length; 
+                    player2Cards = players[1].length; 
                 } else {
                     outputMessage("Game over");
                 }
@@ -333,7 +303,7 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
             function checkWinner(card1, card2, pot) {
                 if ((players[0].length <= 4) || (players[1].length <= 4)) {
                     // gameover = true;
-                    saveGameOver(true, dispatch)
+                    setGameOver(true)
                     saveWinStatus (
                         (players[1].length <= 4) ? (
                             1
@@ -387,22 +357,7 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
                 return bCard;
             }
     
-            // function buildCards() {
-            //     cards = [];
-            //     for (var s in suits) {
-            //         var suitNew = suits[s][0].toUpperCase();
-            //         for (var n in cardFace) {
-            //             var card = {
-            //                 suit: suits[s],
-            //                 num: cardFace[n],
-            //                 cardValue: parseInt(n) + 2,
-            //                 icon: suitNew
-            //             }
-            //             cards.push(card);
-            //         }
-            //     }
-            // }
-    
+   
             function dealCards(array) {
                 for (var i = 0; i < array.length; i++) {
                     var m = i % 2;
@@ -410,25 +365,18 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
                 }
             }
     
-            // function shuffleArray(array) {
-            //     for (var x = array.length - 1; x > 0; x--) {
-            //         var ii = Math.floor(Math.random() * (x + 1));
-            //         var temp = array[x];
-            //         array[x] = array[ii];
-            //         array[ii] = temp;
-            //     }
-            //     return array;
-            // }
 
     
       return (
         <div>
           {account ? (
             <>
-              <h1 className='my-4 text-center'>Let's Play War!</h1>
+              {beginGame && 
+                <h1 className='my-4 text-center'>Let's Play War!</h1>
+              }
               <div className='my-4 text-center'>
-                {!firstRun && 
-               <Countdown date={dateTime} className='h2' autoStart={true} renderer={renderer} />
+                {!beginGame && 
+               <CountdownTimer targetDate={dateTime} timerExpiredHandler={timerExpiredHandler} />
                 //  !gameover ? (<Countdown date={dateTime} className='h2' autoStart={true} renderer={renderer} />
                 //              ) : (
                 //                <h2>Game Over!</h2>
@@ -545,6 +493,52 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
       )
 }
 
+const ExpiredNotice = () => {
+  return (
+    <div className="expired-notice">
+      <span>Game Over!!!</span>
+    </div>
+  );
+};
+
+const ShowCounter = ({ days, hours, minutes, seconds }) => {
+  return (
+    <div className="show-counter">
+      <a
+        href="https://tapasadhikary.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="countdown-link"
+      >
+        <DateTimeDisplay value={days} type={'Days'} isDanger={days <= 3} />
+        <p>:</p>
+        <DateTimeDisplay value={hours} type={'Hours'} isDanger={false} />
+        <p>:</p>
+        <DateTimeDisplay value={minutes} type={'Mins'} isDanger={false} />
+        <p>:</p>
+        <DateTimeDisplay value={seconds} type={'Seconds'} isDanger={false} />
+      </a>
+    </div>
+  );
+};
+
+const CountdownTimer = (props) => {
+  const [days, hours, minutes, seconds] = useCountdown(props.targetDate);
+
+  if (days + hours + minutes + seconds <= 0) {
+    props.timerExpiredHandler()
+    return <ExpiredNotice />;
+  } else {
+    return (
+      <ShowCounter
+        days={days}
+        hours={hours}
+        minutes={minutes}
+        seconds={seconds}
+      />
+    );
+  }
+};
 
 
 export default TestGame
