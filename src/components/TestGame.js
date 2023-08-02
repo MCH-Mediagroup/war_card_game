@@ -148,25 +148,46 @@ const handleStartClick = () => {
   if (beginGame){
       setBeginGame(false);
       setDateTime(Date.now() + (MINUTES_TO_ADD))
+      
       // dealCards(cards);
     }
 
 };
-const savePlayer1CardsHandler = (player1Score) => {
-  setPlayer1Cards(player1Score)
-}
-const savePlayer2CardsHandler = (player2Score) => {
-  setPlayer2Cards(player2Score)
+let totalTokensWon = 0;
+
+const winnerHandler = () => {
+  switch( winState ) {
+    case 1: // Win before timer expires
+      totalTokensWon = (gameTokens + 100) * tokenMultiplier;
+      break;
+    case 2: // Win after timer expires
+      totalTokensWon = (gameTokens + 50) * tokenMultiplier;
+      break;
+    case 3: // Draw
+      totalTokensWon = gameTokens;
+      break;
+    default: // Lose
+      totalTokensWon = 0;
+      break
+  }
+
 }
 const timerExpiredHandler = () => {
   if (!timerExpired)
   {
     timerExpired = true
     gameover = true
-    winState = 1
+    // winState = 1
+    if (player2Cards === player1Cards){
+      winState = 3} else
+    (winState = player1Cards > player2Cards ? 2 : 0)
+
+
     console.log(`Timer Expired winState: ${winState}\n`)
     console.log(`Player1 Cards: ${player1Cards}\n`)
     console.log(`Player2 Cards: ${player2Cards}\n`)
+   
+    winnerHandler()
 
   }
 }
@@ -182,30 +203,30 @@ const payPlayerHandler = async () => {
   setShowAlert(false)
   // console.log(`First Run: ${firstRun}\n`)
 
-  let testWinState = Math.floor(Math.random() * 4);
+  // let testWinState = Math.floor(Math.random() * 4);
 
-  // testWinState = 1  // testing
+  // // testWinState = 1  // testing
 
-  let totalTokensWon = 0;
+  // let totalTokensWon = 0;
 
-  switch( testWinState ) {
-    case 1: // Win before timer expires
-      totalTokensWon = (gameTokens + 100) * tokenMultiplier;
-      break;
-    case 2: // Win after timer expires
-      totalTokensWon = (gameTokens + 50) * tokenMultiplier;
-      break;
-    case 3: // Draw
-      totalTokensWon = gameTokens;
-      break;
-    default: // Lose
-      totalTokensWon = 0;
-      break
-  }
+  // switch( testWinState ) {
+  //   case 1: // Win before timer expires
+  //     totalTokensWon = (gameTokens + 100) * tokenMultiplier;
+  //     break;
+  //   case 2: // Win after timer expires
+  //     totalTokensWon = (gameTokens + 50) * tokenMultiplier;
+  //     break;
+  //   case 3: // Draw
+  //     totalTokensWon = gameTokens;
+  //     break;
+  //   default: // Lose
+  //     totalTokensWon = 0;
+  //     break
+  // }
 
   setPlayerTokens(totalTokensWon)
   playerTokens = totalTokensWon
-  console.log(`Winning State: ${testWinState}\n`)
+  console.log(`Winning State: ${winState}\n`)
   console.log(`Total Player Tokens won: ${playerTokens}\n`)
   console.log(`Total Tokens won: ${totalTokensWon}\n`)
 
@@ -311,6 +332,8 @@ setShowAlert(true)
                             3
                         ) : 0
                     )
+
+                    winnerHandler()
 
                     return;
                 }
@@ -428,7 +451,6 @@ setShowAlert(true)
               <div className='my-4 text-center'>
 
                 <Button  onClick={handleStartClick} className='my-4'>Begin Game</Button> <br />
-                <Button  onClick={payPlayerHandler}>Simulate Play</Button>
             </div>
             <Row>
               <Col>
@@ -469,14 +491,28 @@ setShowAlert(true)
             ) : (
                 <></>
       )}
-        <GameStatus />
+      {!gameover && 
+              <div className='my-4 text-center'>
+              <h2>Game Status</h2>
+        <Row>
+            <Col>
+                <div className='my-4 text-center'>
+                     <h3>Total {symbols} Tokens Won : {totalTokensWon}</h3>
+                </div>
+                <div className='my-4 text-center'>
+                    <Button  onClick={payPlayerHandler}>Pocket Winnings!</Button>
+                </div>
+            </Col>
+        </Row>
+                </div>
+      }
         <div id="wrapper">
     <div id="message">Click Fight to Start Game</div>
     <div id="board">
         <div id="player1" className="players">
             <div>SCORE:<span className="score"></span></div>
             <div className="hand" ></div>
-        </div>
+        </div>  
         <div id="player2" className="players">
             <div>SCORE:<span className="score"></span></div>
             <div className="hand" ></div>
@@ -486,8 +522,6 @@ setShowAlert(true)
         </div>
     </div>
 </div>
-
-        {/* <Game onSavePlayer1Cards={savePlayer1CardsHandler} onSavePlayer2Cards={savePlayer2CardsHandler}/> */}
 
         </div>
       )
@@ -510,13 +544,10 @@ const ShowCounter = ({ days, hours, minutes, seconds }) => {
         rel="noopener noreferrer"
         className="countdown-link"
       >
-        <DateTimeDisplay value={days} type={'Days'} isDanger={days <= 3} />
-        <p>:</p>
-        <DateTimeDisplay value={hours} type={'Hours'} isDanger={false} />
-        <p>:</p>
+        <strong>Game Time Left </strong>
         <DateTimeDisplay value={minutes} type={'Mins'} isDanger={false} />
-        <p>:</p>
-        <DateTimeDisplay value={seconds} type={'Seconds'} isDanger={false} />
+         <p>:</p>
+         <DateTimeDisplay value={seconds} type={'Seconds'} isDanger={false} />
       </a>
     </div>
   );
