@@ -172,9 +172,10 @@ const winnerHandler = () => {
   }
 
 }
-const timerExpiredHandler = () => {
+const handleTimerExpired = () => {
   if (!timerExpired)
   {
+    setWinState(1)
     timerExpired = true
     gameover = true
     // winState = 1
@@ -399,7 +400,7 @@ setShowAlert(true)
               }
               <div className='my-4 text-center'>
                 {!beginGame && 
-               <CountdownTimer targetDate={dateTime} timerExpiredHandler={timerExpiredHandler} />
+               <CountdownTimer targetDate={dateTime} onTimerExpiredHandler={() => handleTimerExpired()} />
                 //  !gameover ? (<Countdown date={dateTime} className='h2' autoStart={true} renderer={renderer} />
                 //              ) : (
                 //                <h2>Game Over!</h2>
@@ -557,7 +558,7 @@ const CountdownTimer = (props) => {
   const [days, hours, minutes, seconds] = useCountdown(props.targetDate);
 
   if (days + hours + minutes + seconds <= 0) {
-    props.timerExpiredHandler()
+    props.handleTimerExpired()
     return <ExpiredNotice />;
   } else {
     return (
