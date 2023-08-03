@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
-import { useTimer } from 'react-timer-hook';
 import { useCountdown } from '../hooks/useCountdown';
 import DateTimeDisplay from './DateTimeDisplay';
 import Button from 'react-bootstrap/Button';
