@@ -12,9 +12,10 @@ import {
 
 const TestTime = () => {
 
-  const gametime = useSelector(state => state.wargame.gametime)
   const gameover = useSelector(state => state.wargame.gameover)
   const winstatus = useSelector(state => state.wargame.winstatus)
+  const slowtime = useSelector(state => state.wargame.slowtime)
+  const playtime = useSelector(state => state.wargame.playtime)
 
 
   const [dateTime, setDateTime] = useState(0)
@@ -24,8 +25,6 @@ const TestTime = () => {
   const [firstRun, setFirstRun] = useState(true)
   let [timerExpired, setTimerExpired] = useState(false)
 
-  const [time, setTime] = useState(0);
-  const [isRunning, setIsRunning] = useState(true);
 
   let [winState, setWinState] = useState(0)
   const dispatch = useDispatch()
@@ -35,6 +34,10 @@ const TestTime = () => {
   const MINUTES_TO_ADD = 60000 * .1  // 3 minute
 
   const [counter, setCounter] = useState(0);
+
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(true);
+
 
   useEffect(() => {
     let timeoutId = null;
@@ -64,6 +67,34 @@ const TestTime = () => {
     setTime(0);
     setIsRunning(true);
   };
+
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [autoPlay, setAutoPlay] = useState(false);
+  const [play, setPlay] = useState(false);
+
+  const setRegularPlay = () => {
+    setTime(0);
+    setIsRunning(true);
+    setIsButtonDisabled(true);
+    setPlay(true);
+  };
+
+  useEffect(() => {
+    // Set up the interval
+    const slowTime = slowtime * 1000
+    const intervalId = setInterval(() => {
+      setIsButtonDisabled(prevState => !prevState);
+    }, slowTime); // Toggle the disabled state of the button every 3 seconds
+
+    // Clear the interval if the component is unmounted
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+
+  useEffect(() => {
+    time >= playtime ? setAutoPlay(true) : setAutoPlay(false);
+    }, [time, playtime]);
 
 const handleStartClick = () => {
     
@@ -95,6 +126,16 @@ const handleStartClick = () => {
                      <button onClick={stopTimer}>Stop timer</button>
                      <button onClick={startTimer}>Start timer</button>
                      <button onClick={restartTimer}>Restart timer</button>
+                  </div>
+                  <div>
+                    <button disabled={isButtonDisabled} onClick={setRegularPlay}>My Button</button>
+                    { autoPlay ? (
+                      <p>Auto Play!</p>
+                    ) : play ? (
+                      <p>Play!</p>
+                    ) : (
+                      <></>
+                    )}
                   </div>
           </div>
           <Button  onClick={handleStartClick}>Simulate Play</Button>
