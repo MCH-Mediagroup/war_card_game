@@ -1,9 +1,9 @@
 body {
-  background-color: #050505;
+  background-color: #065c2d;
   color: white;
   padding: 40px;
   font-family: Arial;
-  text-align: center;
+  text-align: left;
 }
 .icard {
     position: absolute;
