@@ -1,13 +1,13 @@
 {
   "31337": {
     "token": {
-      "address": "0xD5bFeBDce5c91413E41cc7B24C8402c59A344f7c"
+      "address": "0xC220Ed128102d888af857d137a54b9B7573A41b2"
     },
     "wargame": {
-      "address": "0x77AD263Cd578045105FBFC88A477CAd808d39Cf6"
+      "address": "0xfaE849108F2A63Abe3BaB17E21Be077d07e7a9A2"
     },
     "nft": {
-      "address": "0x05bB67cB592C1753425192bF8f34b95ca8649f09"
+      "address": "0xce830DA8667097BB491A70da268b76a081211814"
     }
   }
 }
