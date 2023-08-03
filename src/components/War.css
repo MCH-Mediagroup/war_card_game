@@ -1,3 +1,10 @@
+body {
+  background-color: #050505;
+  color: white;
+  padding: 40px;
+  font-family: Arial;
+  text-align: center;
+}
 .icard {
     position: absolute;
     padding: 10px;
@@ -131,7 +138,7 @@
     border: 1px solid #ebebeb;
     border-radius: 0.25rem;
     text-decoration: none;
-    color: #000;
+    color: #efdbdb;
   }
   
   .show-counter .countdown {

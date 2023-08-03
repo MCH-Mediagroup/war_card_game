@@ -72,8 +72,8 @@ const TestGame = () => {
 
   const dispatch = useDispatch()
       // Fetch Countdown
-  // const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
-  const MINUTES_TO_ADD = 60000 * .25  // testing
+  const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
+  // const MINUTES_TO_ADD = 60000 * .25  // testing
   const fetchCardData = () => {
     fetch("http://192.168.254.133:5050/api/Cards/getcards")
       .then(res => res.json())
@@ -171,11 +171,11 @@ const timerExpiredHandler = () => {
   if (!timerExpired)
   {
 
-    let timerExpired = true
+    timerExpired = true
     setTimerExpired(timerExpired)
 
-    let gameover = true
-    setGameOver(gameover)
+    gameOver = true
+    setGameOver(gameOver)
 
     // let winState = 0
     if (player2Cards === player1Cards){
@@ -297,17 +297,23 @@ setShowAlert(true)
     
             function checkWinner(card1, card2, pot) {
                 if ((players[0].length <= 4) || (players[1].length <= 4)) {
-                    let gameover = true;
-                    setGameOver(gameover)
-                    let winState = (
+                  // if ((players[0].length > 26) || (players[1].length > 26)) {
+                    gameOver = true;
+                    setGameOver(gameOver)
+                    winState = (
                         (players[1].length <= 4) ? (
                             1
                         ) : players[1].length === players[0].length ? (
                             3
                         ) : 0
                     )
+                    // winState = 1  //Testing
                     setWinState(winState)
 
+                    console.log(`Game Played winState: ${winState}\n`)
+                    console.log(`Player1 Cards: ${player1Cards}\n`)
+                    console.log(`Player2 Cards: ${player2Cards}\n`)
+                
                     winnerHandler()
 
                     return;

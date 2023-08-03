@@ -1,9 +1,8 @@
-import React, { useState, useReducer } from 'react';
-// import CountdownTimer from './CountdownTimer';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
-import DateTimeDisplay from './DateTimeDisplay';
+import { useTimer } from 'react-timer-hook';
 import { useCountdown } from '../hooks/useCountdown';
-
+import DateTimeDisplay from './DateTimeDisplay';
 import Button from 'react-bootstrap/Button';
 
 import {
@@ -33,7 +32,16 @@ const TestTime = () => {
   //const MINUTES_TO_ADD = 60000 * gametime  // 3 minute
   const MINUTES_TO_ADD = 60000 * .1  // 3 minute
 
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCounter((prevCounter) => prevCounter + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
 
 const handleStartClick = () => {
     
@@ -55,13 +63,25 @@ const handleStartClick = () => {
   
         }
       }
-      
-     
+      const time = new Date();
+  time.setSeconds(time.getSeconds() + 15); // 10 minutes timer
+//   function rounds(a) {
+//     var timer;
+//     var r = 0;
+//     r = a;
+//     timer = setInterval(function () {
+        
+//     }, 100);
+// }
       return (
         <>
           <div className='my-4 text-center'>
                 {!firstRun && <CountdownTimer targetDate={dateTime} timerExpiredHandler={() => timerExpiredHandler()} />} <br />
                 winState = {winState} 
+                <div className="App">
+      <h1>Counter: {counter}</h1>
+      <Button onClick={clearInterval()}>Clear Interval</Button>
+    </div>
           </div>
           <Button  onClick={handleStartClick}>Simulate Play</Button>
 
@@ -69,6 +89,7 @@ const handleStartClick = () => {
         </>
       )
 }
+
 const ExpiredNotice = () => {
   return (
     <div className="expired-notice">

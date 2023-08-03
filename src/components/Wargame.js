@@ -72,8 +72,8 @@ const Wargame = () => {
 
   const dispatch = useDispatch()
       // Fetch Countdown
-  // const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
-  const MINUTES_TO_ADD = 60000 * .25  // testing
+  const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
+  // const MINUTES_TO_ADD = 60000 * .25  // testing
   const fetchCardData = () => {
     fetch("http://192.168.254.133:5050/api/Cards/getcards")
       .then(res => res.json())
