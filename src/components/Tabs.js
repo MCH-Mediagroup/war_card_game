@@ -16,12 +16,12 @@ const Tabs = () => {
       <LinkContainer to="/testgame">
         <Nav.Link>Test Game</Nav.Link>
       </LinkContainer>
-      <LinkContainer to="/testcard">
+      {/* <LinkContainer to="/testcard">
         <Nav.Link>Test Card</Nav.Link>
-      </LinkContainer>
-      <LinkContainer to="/testtime">
+      </LinkContainer> */}
+      {/* <LinkContainer to="/testtime">
         <Nav.Link>Test Time</Nav.Link>
-      </LinkContainer>
+      </LinkContainer> */}
     </Nav>
   );
 }

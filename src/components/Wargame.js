@@ -1,41 +1,249 @@
-import { useRef, useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
 
+import DateTimeDisplay from './DateTimeDisplay';
+import { useCountdown } from '../hooks/useCountdown';
+
+import Card from 'react-bootstrap/Card';
+import Form from 'react-bootstrap/Form';
+import { Row, Col } from 'react-bootstrap'
+import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 
+import Spinner from 'react-bootstrap/Spinner';
+
+import Alert from './Alert'
 import './War.css';
 
+
+import {
+  payPlayer,
+  loadBalances,
+  loadAccount,
+  withdrawTokens,
+  saveGameOver,
+  savePlayGame,
+  saveWinStatus
+} from '../store/interactions'
+
+
 const Wargame = () => {
+  const provider = useSelector(state => state.provider.connection)
+  const account = useSelector(state => state.provider.account)
+
+  const tokens = useSelector(state => state.tokens.contracts)
+  const symbols = useSelector(state => state.tokens.symbols)
+  const wargame = useSelector(state => state.wargame.contract)
+  const wargameBalance = useSelector(state => state.wargame.balance)
+  const playerBalance = useSelector(state => state.tokens.balances)
+  const gametime = useSelector(state => state.wargame.gametime)
+  const playgame = useSelector(state => state.wargame.playgame)
+  const winstatus = useSelector(state => state.wargame.winstatus)
+  const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
+  const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
+  const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
+  const isPaying = useSelector(state => state.wargame.paying.isWithdrawing)
+  const isSuccessPaying = useSelector(state => state.wargame.paying.isSuccess)
+  const payTransactionHash = useSelector(state => state.wargame.paying.transactionHash)
+
+  const [dateTime, setDateTime] = useState(0)
+
+  let [beginGame, setBeginGame] = useState(true)
+  const [isBetting, setIsBetting] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [hasBet, setHasBet] = useState(false)
+
+  const [showAlert, setShowAlert] = useState(false)
+
+  let [timerExpired, setTimerExpired] = useState(false)
+  let [gameOver, setGameOver] = useState(false)
+
+  let [winState, setWinState] = useState(0)
+
+  let [player1Cards, setPlayer1Cards] = useState(0)
+  let [player2Cards, setPlayer2Cards] = useState(0)
+  let [playerTokens, setPlayerTokens] = useState(0)
+  let [gameTokens, setGameTokens] = useState(0)
+  let [tokenAmount, setTokenAmount] = useState(0)
+  let [tokenMultiplier, setTokenMultiplier] = useState(1)
 
   let [data, setCards] = useState([])
 
+
+  const dispatch = useDispatch()
+      // Fetch Countdown
+  // const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
+  const MINUTES_TO_ADD = 60000 * .25  // testing
   const fetchCardData = () => {
     fetch("http://192.168.254.133:5050/api/Cards/getcards")
       .then(res => res.json())
       .then(data => {
           setCards(data)
-        //   console.log(data)
         })
-         //console.log(cards)
       }
 
       useEffect(() => {
         fetchCardData()
     }, []);
 
-    // Cards Game below this comment
-    //  The cards from the API is called randomCards
-    const player1HandRef = useRef(null);
-    const player2HandRef = useRef(null);
+  const loadInitialData = async () => {
 
-    // var suits = ["spades", "hearts", "clubs", "diams"];
-    // var cardFace = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+    console.log(`Total Game Tokens available: ${wargameBalance}\n`)
+
+}
+
+const isBettingHandler = async () => {
+  setIsBetting(true)
+}
+const cancelBetHandler = async () => {
+  setIsBetting(false)
+}
+const betHandler = async (e) => {
+  e.preventDefault()
+  setShowAlert(false)
+  
+
+
+  console.log(`TokenAmount : ${tokenAmount}\n`)
+
+
+  console.log(`Account : ${account}\n`)
+
+  await withdrawTokens(provider, wargame, tokens, tokenAmount, dispatch)
+
+  await loadBalances(tokens, account, dispatch)
+
+  setGameTokens(Number(tokenAmount))
+
+  setTokenMultiplier(2)
+  tokenMultiplier = 2
+
+  console.log(`Game Tokens betting : ${gameTokens} with multiplier: ${tokenMultiplier}\n`)
+
+  setPlayerTokens(0)
+
+  setHasBet(true)
+
+  setShowAlert(true)
+
+
+}
+
+const amountHandler = async (e) => {
+    setTokenAmount(e.target.value)
+}
+
+const handleStartClick = () => {
+ 
+  if (beginGame){
+      setBeginGame(false);
+      setDateTime(Date.now() + (MINUTES_TO_ADD))
+      
+    }
+
+};
+let totalTokensWon = 0;
+
+const winnerHandler = () => {
+  switch( winState ) {
+    case 1: // Win before timer expires
+      totalTokensWon = (gameTokens + 100) * tokenMultiplier;
+      break;
+    case 2: // Win after timer expires
+      totalTokensWon = (gameTokens + 50) * tokenMultiplier;
+      break;
+    case 3: // Draw
+      totalTokensWon = gameTokens;
+      break;
+    default: // Lose
+      totalTokensWon = 0;
+      break
+  }
+  setPlayerTokens(totalTokensWon)
+  playerTokens = totalTokensWon
+  console.log(`Player Tokens: ${playerTokens}\n`)
+
+
+
+
+}
+const timerExpiredHandler = () => {
+  if (!timerExpired)
+  {
+
+    let timerExpired = true
+    setTimerExpired(timerExpired)
+
+    let gameover = true
+    setGameOver(gameover)
+
+    // let winState = 0
+    if (player2Cards === player1Cards){
+      winState = 3} else
+    (winState = player1Cards > player2Cards ? 2 : 0)
+    setWinState(winState)
+
+
+    console.log(`Timer Expired winState: ${winState}\n`)
+    console.log(`Player1 Cards: ${player1Cards}\n`)
+    console.log(`Player2 Cards: ${player2Cards}\n`)
+   
+    winnerHandler()
+
+  }
+}
+
+const payPlayerHandler = async () => {
+  // e.preventDefault()
+
+  console.log(`Game Tokens before: ${gameTokens}\n`)
+  console.log(`Player Tokens before: ${playerTokens}\n`)
+  console.log(`Token multiplier before: ${tokenMultiplier}\n`)
+
+
+  setShowAlert(false)
+  console.log(`Winning State: ${winState}\n`)
+  console.log(`Total Player Tokens won: ${playerTokens}\n`)
+  // console.log(`Total Tokens won: ${totalTokensWon}\n`)
+
+  // const _tokenAmount = playerTokens
+
+  playerTokens !== 0 && await payPlayer(
+      provider,
+      wargame,
+      playerTokens,
+      dispatch
+  )
+
+  await loadBalances(tokens, account, dispatch)
+
+// reset player tokens
+setPlayerTokens(0)
+setGameTokens(0)
+playerTokens = 0
+gameTokens = 0
+setTokenAmount(0)
+setTokenMultiplier(1)
+
+setIsBetting(false)
+setHasBet(false)
+// setFirstRun(true)
+
+console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
+
+setShowAlert(true)
+
+}
+
+    // Cards Game below this comment
+
     var cards = data;
     var players = [
         [],
         []
     ];
     var firstRun = true;
-    var gameover = false;
+    //var gameover = false;
     var timer;
     var r = 0;
     // var fightButton = document.querySelector("#btnBattle");
@@ -45,23 +253,8 @@ const Wargame = () => {
     var s1 = document.querySelector("#player1 .score");
     var s2 = document.querySelector("#player2 .score");
 
-    //event listeners
-    // fightButton.addEventListener('click', battle);
-    // fightButton10.addEventListener('click', function () {
-    //     rounds(10);
-    // });
-    // fightButton50.addEventListener('click', function () {
-    //     rounds(50);
-    // });
-
     
               //functions
-            //   function rounds(a) {
-            //     r = a;
-            //     timer = setInterval(function () {
-            //         battle()
-            //     }, 100);
-            // }
     
             function battle() {
                 if (timer) {
@@ -76,12 +269,13 @@ const Wargame = () => {
                     // buildCards();
                     // shuffleArray(cards);
                     dealCards(cards);
+                    // setIsPlaying(true)
                 }
                 attack();
             }
     
             function attack() {
-                if (!gameover) {
+                if (!gameOver) {
                     var card1 = players[0].shift();
                     var card2 = players[1].shift();
                     var pot = [card1, card2];
@@ -90,6 +284,8 @@ const Wargame = () => {
                     checkWinner(card1, card2, pot);
                     s1.innerHTML = players[0].length; 
                     s2.innerHTML = players[1].length; 
+                    player1Cards = players[0].length; 
+                    player2Cards = players[1].length; 
                 } else {
                     outputMessage("Game over");
                 }
@@ -101,7 +297,19 @@ const Wargame = () => {
     
             function checkWinner(card1, card2, pot) {
                 if ((players[0].length <= 4) || (players[1].length <= 4)) {
-                    gameover = true;
+                    let gameover = true;
+                    setGameOver(gameover)
+                    let winState = (
+                        (players[1].length <= 4) ? (
+                            1
+                        ) : players[1].length === players[0].length ? (
+                            3
+                        ) : 0
+                    )
+                    setWinState(winState)
+
+                    winnerHandler()
+
                     return;
                 }
                 if (card1.cardValue > card2.cardValue) {
@@ -146,23 +354,7 @@ const Wargame = () => {
                 bCard += '<div class="cardbottom suit">' + c.num + '<br></div></div>';
                 return bCard;
             }
-    
-            // function buildCards() {
-            //     cards = [];
-            //     for (var s in suits) {
-            //         var suitNew = suits[s][0].toUpperCase();
-            //         for (var n in cardFace) {
-            //             var card = {
-            //                 suit: suits[s],
-            //                 num: cardFace[n],
-            //                 cardValue: parseInt(n) + 2,
-            //                 icon: suitNew
-            //             }
-            //             cards.push(card);
-            //         }
-            //     }
-            // }
-    
+   
             function dealCards(array) {
                 for (var i = 0; i < array.length; i++) {
                     var m = i % 2;
@@ -170,42 +362,188 @@ const Wargame = () => {
                 }
             }
     
-            // function shuffleArray(array) {
-            //     for (var x = array.length - 1; x > 0; x--) {
-            //         var ii = Math.floor(Math.random() * (x + 1));
-            //         var temp = array[x];
-            //         array[x] = array[ii];
-            //         array[ii] = temp;
-            //     }
-            //     return array;
-            // }
+      return (
+        <div>
+            {account ? (
+              <>
+                <Row>
+                  <Col>
+                    <Form onSubmit={betHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
+                    { isBetting && !hasBet &&
+                    <div>
+                        <Row>
+                              <Form.Text className='text-end my-0' muted>
+                                  Balance: {playerBalance}
+                              </Form.Text>
+                              <InputGroup>
+                                  <Form.Control
+                                      type="number"
+                                      placeholder="0.0"
+                                      min="1.0"
+                                      max={playerBalance}
+                                      step="any"
+                                      id="token1"
+                                      onChange={(e) => amountHandler(e)}
+                                      value={tokenAmount === 0 ? "" : tokenAmount}
+                                  />
+                                  <InputGroup.Text style={{ width: "100px" }} className="justify-content-center">
+                                      { symbols }
+                                  </InputGroup.Text>
+                              </InputGroup>
+                          </Row>
+                          <Row>
+                            <Button type="submit" className='m-2'>Go For It!</Button>
+                            <Button onClick={cancelBetHandler} className='m-2'>Cancel</Button>
+                          </Row>
+                      </div>
+                      }
+                      {!isBetting && !hasBet && beginGame && <Button  onClick={isBettingHandler} className='m-2'>Bet your {symbols} Tokens?</Button>}
+                      {!isPlaying && !gameOver && hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>}
+                    </Form>
+                  </Col>
+                  <Col>
+                  <div className='py-4'>
+                      <p className='text-center'><strong>Your {symbols} Total Balance:</strong> {playerBalance} {symbols}</p>
+                      <p className='text-center'><strong>Number of Tokens to play with:</strong> {playerTokens} {symbols}</p>
+                  </div>
+                  </Col>
+                </Row>
+                <div className='my-0 text-center'>
+                  {beginGame ? (
+                          <h1 className='my-4 text-center'>Let's Play War!</h1>
+                      ) : (!beginGame && !gameOver) ? (
+                          <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
+                     ) : (!beginGame && gameOver) && (
+                        <div className='my-4 text-center'>
+                            <Row>
+                                <Col>
+                                    <div className='my-4 text-center'>
+                                        <h3>Total {symbols} Tokens Won : {playerTokens}</h3>
+                                    </div>
 
+                                    {playerTokens > 0 && (<div className='my-4 text-center'>
+                                        <Button  onClick={payPlayerHandler}>Pocket Winnings!</Button>
+                                    </div>)}
+                                </Col>
+                            </Row>
+                          </div>
+                     )
+                  }
+                  <br />
+                </div>
 
-    return (
-    <>
+                <div className='my-4 text-center'>
+
+                  <Button  onClick={handleStartClick} className='my-4'>Begin Game</Button> <br />
+              </div>
+              <Row>
+                <Col>
+                </Col>
+              </Row>
+              </>
+              ) : (
+                <p
+                className='d-flex justify-content-center align-items-center'
+                style={{ height: '300px' }}
+              >
+                Please connect wallet.
+              </p>
+
+              )
+            }
+                {isPaying || isWithdrawing ? (
+                  <Alert
+                  message={'Transaction Pending...'}
+                  transactionHash={null}
+                  variant={'info'}
+                  setShowAlert={setShowAlert}
+                  />
+              ) : (isSuccessPaying || isSuccess) && showAlert ? (
+                  <Alert
+                  message={'Transaction Successful'}
+                  transactionHash={payTransactionHash}
+                  variant={'success'}
+                  setShowAlert={setShowAlert}
+                  />
+              ) : (!isSuccessPaying || !isSuccess) && showAlert ? (
+                  <Alert
+                  message={'Transaction Failed'}
+                  transactionHash={null}
+                  variant={'danger'}
+                  setShowAlert={setShowAlert}
+                  />
+              ) : (
+                  <></>
+        )}
         <div id="wrapper">
-    <div id="message">Click Fight to Start Game</div>
-    <div id="board">
-        <div id="player1" className="players">
-            <div>SCORE:<span className="score"></span></div>
-            <div className="hand" ref={player1HandRef}></div>
-        </div>
-        <div id="player2" className="players">
-            <div>SCORE:<span className="score"></span></div>
-            <div className="hand" ref={player2HandRef}></div>
-        </div>
-        <div id="action">
-        <Button  onClick={battle}>Fight</Button>
-
-            {/* <button id="btnBattle" type="button" className="btn">Fight</button> */}
-
-        </div>
+          <div id="message">Click Fight to Start Game</div>
+            <div id="board">
+              <div id="player1" className="players">
+                  <div>SCORE:<span className="score"></span></div>
+                  <div className="hand" ></div>
+              </div>  
+              <div id="player2" className="players">
+                  <div>SCORE:<span className="score"></span></div>
+                  <div className="hand" ></div>
+              </div>
+              <div id="action">
+                  {!gameOver && !beginGame && <Button  onClick={battle}>Fight</Button>}
+              </div>
+            </div>
+          </div>
     </div>
-</div>
-
-    </>
-  );
-
+  )
 }
 
-export default Wargame;
+const ExpiredNotice = () => {
+  return (
+    <div className="expired-notice">
+      <span>Game Over!!!</span>
+    </div>
+  );
+};
+
+const ShowCounter = ({ days, hours, minutes, seconds }) => {
+  return (
+    <div className="show-counter">
+      <a
+        href="https://tapasadhikary.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="countdown-link"
+      >
+        <strong>Game Time Left </strong>
+        <DateTimeDisplay value={minutes} type={'Mins'} isDanger={false} />
+         <p>:</p>
+         <DateTimeDisplay value={seconds} type={'Seconds'} isDanger={false} />
+      </a>
+    </div>
+  );
+};
+
+const CountdownTimer = (props) => {
+  const [days, hours, minutes, seconds] = useCountdown(props.targetDate);
+
+  if (days + hours + minutes + seconds <= 0) {
+    return (
+      <>
+        <ExpiredNotice />
+        <Button onClick={props.onTimerExpired}>
+          Click To Show Results!
+        </Button>
+    </>
+  );
+  } else {
+    return (
+      <ShowCounter
+        days={days}
+        hours={hours}
+        minutes={minutes}
+        seconds={seconds}
+      />
+    );
+  }
+};
+
+
+export default Wargame

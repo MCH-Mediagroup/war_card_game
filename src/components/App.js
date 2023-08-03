@@ -17,7 +17,6 @@ import {
   loadTokens,
   loadWargame
 } from '../store/interactions';
-import TestCard from './TestCard';
 import TestGame from './TestGame';
 import TestTime from './TestTime';
 
@@ -77,8 +76,7 @@ function App() {
           {/* <Route path="/admin" element={<Admin />} />
           <Route path="/rewards" element={<Rewards />} /> */}
           <Route path="/testgame" element={<TestGame />} />
-          <Route path="/testcard" element={<TestCard />} />
-          <Route path="/testtime" element={<TestTime />} />
+          {/* <Route path="/testtime" element={<TestTime />} /> */}
         </Routes>
 
       </HashRouter>

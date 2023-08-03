@@ -11,11 +11,10 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 
 import Spinner from 'react-bootstrap/Spinner';
-import { ethers } from 'ethers'
 
 import Alert from './Alert'
-import Game from './Game'
-import GameStatus from './GameStatus';
+import './War.css';
+
 
 import {
   payPlayer,
@@ -39,10 +38,7 @@ const TestGame = () => {
   const playerBalance = useSelector(state => state.tokens.balances)
   const gametime = useSelector(state => state.wargame.gametime)
   const playgame = useSelector(state => state.wargame.playgame)
-  //const gameover = useSelector(state => state.wargame.gameover)
   const winstatus = useSelector(state => state.wargame.winstatus)
-  // let player1cards = useSelector(state => state.wargame.player1cards)
-  // let player2cards = useSelector(state => state.wargame.player2cards)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
@@ -52,15 +48,15 @@ const TestGame = () => {
 
   const [dateTime, setDateTime] = useState(0)
 
-  // const [gameTime, setGameTime] = useState(0)
   let [beginGame, setBeginGame] = useState(true)
   const [isBetting, setIsBetting] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
   const [hasBet, setHasBet] = useState(false)
 
   const [showAlert, setShowAlert] = useState(false)
 
   let [timerExpired, setTimerExpired] = useState(false)
-  let [gameover, setGameOver] = useState(false)
+  let [gameOver, setGameOver] = useState(false)
 
   let [winState, setWinState] = useState(0)
 
@@ -83,9 +79,7 @@ const TestGame = () => {
       .then(res => res.json())
       .then(data => {
           setCards(data)
-        //   console.log(data)
         })
-         //console.log(cards)
       }
 
       useEffect(() => {
@@ -97,10 +91,6 @@ const TestGame = () => {
     console.log(`Total Game Tokens available: ${wargameBalance}\n`)
 
 }
-// useEffect(() => {
-//    loadInitialData()
-   
-// }, []);
 
 const isBettingHandler = async () => {
   setIsBetting(true)
@@ -149,7 +139,6 @@ const handleStartClick = () => {
       setBeginGame(false);
       setDateTime(Date.now() + (MINUTES_TO_ADD))
       
-      // dealCards(cards);
     }
 
 };
@@ -170,18 +159,29 @@ const winnerHandler = () => {
       totalTokensWon = 0;
       break
   }
+  setPlayerTokens(totalTokensWon)
+  playerTokens = totalTokensWon
+  console.log(`Player Tokens: ${playerTokens}\n`)
+
+
+
 
 }
-const handleTimerExpired = () => {
+const timerExpiredHandler = () => {
   if (!timerExpired)
   {
-    setWinState(1)
-    timerExpired = true
-    gameover = true
-    // winState = 1
+
+    let timerExpired = true
+    setTimerExpired(timerExpired)
+
+    let gameover = true
+    setGameOver(gameover)
+
+    // let winState = 0
     if (player2Cards === player1Cards){
       winState = 3} else
     (winState = player1Cards > player2Cards ? 2 : 0)
+    setWinState(winState)
 
 
     console.log(`Timer Expired winState: ${winState}\n`)
@@ -202,39 +202,11 @@ const payPlayerHandler = async () => {
 
 
   setShowAlert(false)
-  // console.log(`First Run: ${firstRun}\n`)
-
-  // let testWinState = Math.floor(Math.random() * 4);
-
-  // // testWinState = 1  // testing
-
-  // let totalTokensWon = 0;
-
-  // switch( testWinState ) {
-  //   case 1: // Win before timer expires
-  //     totalTokensWon = (gameTokens + 100) * tokenMultiplier;
-  //     break;
-  //   case 2: // Win after timer expires
-  //     totalTokensWon = (gameTokens + 50) * tokenMultiplier;
-  //     break;
-  //   case 3: // Draw
-  //     totalTokensWon = gameTokens;
-  //     break;
-  //   default: // Lose
-  //     totalTokensWon = 0;
-  //     break
-  // }
-
-  setPlayerTokens(totalTokensWon)
-  playerTokens = totalTokensWon
   console.log(`Winning State: ${winState}\n`)
   console.log(`Total Player Tokens won: ${playerTokens}\n`)
-  console.log(`Total Tokens won: ${totalTokensWon}\n`)
+  // console.log(`Total Tokens won: ${totalTokensWon}\n`)
 
-
-
-
-  const _tokenAmount = playerTokens
+  // const _tokenAmount = playerTokens
 
   playerTokens !== 0 && await payPlayer(
       provider,
@@ -297,12 +269,13 @@ setShowAlert(true)
                     // buildCards();
                     // shuffleArray(cards);
                     dealCards(cards);
+                    // setIsPlaying(true)
                 }
                 attack();
             }
     
             function attack() {
-                if (!gameover) {
+                if (!gameOver) {
                     var card1 = players[0].shift();
                     var card2 = players[1].shift();
                     var pot = [card1, card2];
@@ -324,15 +297,16 @@ setShowAlert(true)
     
             function checkWinner(card1, card2, pot) {
                 if ((players[0].length <= 4) || (players[1].length <= 4)) {
-                    // gameover = true;
-                    setGameOver(true)
-                    saveWinStatus (
+                    let gameover = true;
+                    setGameOver(gameover)
+                    let winState = (
                         (players[1].length <= 4) ? (
                             1
                         ) : players[1].length === players[0].length ? (
                             3
                         ) : 0
                     )
+                    setWinState(winState)
 
                     winnerHandler()
 
@@ -380,7 +354,6 @@ setShowAlert(true)
                 bCard += '<div class="cardbottom suit">' + c.num + '<br></div></div>';
                 return bCard;
             }
-    
    
             function dealCards(array) {
                 for (var i = 0; i < array.length; i++) {
@@ -389,143 +362,137 @@ setShowAlert(true)
                 }
             }
     
-
-    
       return (
         <div>
-          {account ? (
-            <>
-              {beginGame && 
-                <h1 className='my-4 text-center'>Let's Play War!</h1>
-              }
-              <div className='my-4 text-center'>
-                {!beginGame && 
-               <CountdownTimer targetDate={dateTime} onTimerExpiredHandler={() => handleTimerExpired()} />
-                //  !gameover ? (<Countdown date={dateTime} className='h2' autoStart={true} renderer={renderer} />
-                //              ) : (
-                //                <h2>Game Over!</h2>
-                //              )
-                } <br />
+            {account ? (
+              <>
+                <Row>
+                  <Col>
+                    <Form onSubmit={betHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
+                    { isBetting && !hasBet &&
+                    <div>
+                        <Row>
+                              <Form.Text className='text-end my-0' muted>
+                                  Balance: {playerBalance}
+                              </Form.Text>
+                              <InputGroup>
+                                  <Form.Control
+                                      type="number"
+                                      placeholder="0.0"
+                                      min="1.0"
+                                      max={playerBalance}
+                                      step="any"
+                                      id="token1"
+                                      onChange={(e) => amountHandler(e)}
+                                      value={tokenAmount === 0 ? "" : tokenAmount}
+                                  />
+                                  <InputGroup.Text style={{ width: "100px" }} className="justify-content-center">
+                                      { symbols }
+                                  </InputGroup.Text>
+                              </InputGroup>
+                          </Row>
+                          <Row>
+                            <Button type="submit" className='m-2'>Go For It!</Button>
+                            <Button onClick={cancelBetHandler} className='m-2'>Cancel</Button>
+                          </Row>
+                      </div>
+                      }
+                      {!isBetting && !hasBet && beginGame && <Button  onClick={isBettingHandler} className='m-2'>Bet your {symbols} Tokens?</Button>}
+                      {!isPlaying && !gameOver && hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>}
+                    </Form>
+                  </Col>
+                  <Col>
+                  <div className='py-4'>
+                      <p className='text-center'><strong>Your {symbols} Total Balance:</strong> {playerBalance} {symbols}</p>
+                      <p className='text-center'><strong>Number of Tokens to play with:</strong> {playerTokens} {symbols}</p>
+                  </div>
+                  </Col>
+                </Row>
+                <div className='my-0 text-center'>
+                  {beginGame ? (
+                          <h1 className='my-4 text-center'>Let's Play War!</h1>
+                      ) : (!beginGame && !gameOver) ? (
+                          <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
+                     ) : (!beginGame && gameOver) && (
+                        <div className='my-4 text-center'>
+                            <Row>
+                                <Col>
+                                    <div className='my-4 text-center'>
+                                        <h3>Total {symbols} Tokens Won : {playerTokens}</h3>
+                                    </div>
+
+                                    {playerTokens > 0 && (<div className='my-4 text-center'>
+                                        <Button  onClick={payPlayerHandler}>Pocket Winnings!</Button>
+                                    </div>)}
+                                </Col>
+                            </Row>
+                          </div>
+                     )
+                  }
+                  <br />
+                </div>
+
+                <div className='my-4 text-center'>
+
+                  <Button  onClick={handleStartClick} className='my-4'>Begin Game</Button> <br />
               </div>
               <Row>
                 <Col>
-                  <Form onSubmit={betHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
-                  { isBetting && !hasBet &&
-                  <>
-                      <Row>
-                            <Form.Text className='text-end my-2' muted>
-                                Balance: {playerBalance}
-                            </Form.Text>
-                            <InputGroup>
-                                <Form.Control
-                                    type="number"
-                                    placeholder="0.0"
-                                    min="1.0"
-                                    max={playerBalance}
-                                    step="any"
-                                    id="token1"
-                                    onChange={(e) => amountHandler(e)}
-                                    value={tokenAmount === 0 ? "" : tokenAmount}
-                                />
-                                <InputGroup.Text style={{ width: "100px" }} className="justify-content-center">
-                                    { symbols }
-                                </InputGroup.Text>
-                            </InputGroup>
-                        </Row>
-                        <Row>
-                          <Button type="submit" className='m-2'>Go For It!</Button>
-                          <Button onClick={cancelBetHandler} className='m-2'>Cancel</Button>
-                        </Row>
-                    </>
-                    }
-                    {!isBetting && !hasBet && <Button  onClick={isBettingHandler} className='m-2'>Bet your {symbols} Tokens?</Button>}
-                    {hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>}
-                  </Form>
-                </Col>
-                <Col>
-                <p className='text-center'><strong>Your {symbols} Total Balance:</strong> {playerBalance} {symbols}</p>
-                <p className='text-center'><strong>Number of Tokens to play with:</strong> {playerTokens} {symbols}</p>
-                
                 </Col>
               </Row>
+              </>
+              ) : (
+                <p
+                className='d-flex justify-content-center align-items-center'
+                style={{ height: '300px' }}
+              >
+                Please connect wallet.
+              </p>
 
-              <div className='my-4 text-center'>
-
-                <Button  onClick={handleStartClick} className='my-4'>Begin Game</Button> <br />
-            </div>
-            <Row>
-              <Col>
-              </Col>
-            </Row>
-            </>
-            ) : (
-              <p
-              className='d-flex justify-content-center align-items-center'
-              style={{ height: '300px' }}
-            >
-              Please connect wallet.
-            </p>
-
-            )
-          }
-              {isPaying || isWithdrawing ? (
-                <Alert
-                message={'Transaction Pending...'}
-                transactionHash={null}
-                variant={'info'}
-                setShowAlert={setShowAlert}
-                />
-            ) : (isSuccessPaying || isSuccess) && showAlert ? (
-                <Alert
-                message={'Transaction Successful'}
-                transactionHash={payTransactionHash}
-                variant={'success'}
-                setShowAlert={setShowAlert}
-                />
-            ) : (!isSuccessPaying || !isSuccess) && showAlert ? (
-                <Alert
-                message={'Transaction Failed'}
-                transactionHash={null}
-                variant={'danger'}
-                setShowAlert={setShowAlert}
-                />
-            ) : (
-                <></>
-      )}
-      {!gameover && 
-              <div className='my-4 text-center'>
-              <h2>Game Status</h2>
-        <Row>
-            <Col>
-                <div className='my-4 text-center'>
-                     <h3>Total {symbols} Tokens Won : {totalTokensWon}</h3>
-                </div>
-                <div className='my-4 text-center'>
-                    <Button  onClick={payPlayerHandler}>Pocket Winnings!</Button>
-                </div>
-            </Col>
-        </Row>
-                </div>
-      }
+              )
+            }
+                {isPaying || isWithdrawing ? (
+                  <Alert
+                  message={'Transaction Pending...'}
+                  transactionHash={null}
+                  variant={'info'}
+                  setShowAlert={setShowAlert}
+                  />
+              ) : (isSuccessPaying || isSuccess) && showAlert ? (
+                  <Alert
+                  message={'Transaction Successful'}
+                  transactionHash={payTransactionHash}
+                  variant={'success'}
+                  setShowAlert={setShowAlert}
+                  />
+              ) : (!isSuccessPaying || !isSuccess) && showAlert ? (
+                  <Alert
+                  message={'Transaction Failed'}
+                  transactionHash={null}
+                  variant={'danger'}
+                  setShowAlert={setShowAlert}
+                  />
+              ) : (
+                  <></>
+        )}
         <div id="wrapper">
-    <div id="message">Click Fight to Start Game</div>
-    <div id="board">
-        <div id="player1" className="players">
-            <div>SCORE:<span className="score"></span></div>
-            <div className="hand" ></div>
-        </div>  
-        <div id="player2" className="players">
-            <div>SCORE:<span className="score"></span></div>
-            <div className="hand" ></div>
-        </div>
-        <div id="action">
-            {!gameover && <Button  onClick={battle}>Fight</Button>}
-        </div>
+          <div id="message">Click Fight to Start Game</div>
+            <div id="board">
+              <div id="player1" className="players">
+                  <div>SCORE:<span className="score"></span></div>
+                  <div className="hand" ></div>
+              </div>  
+              <div id="player2" className="players">
+                  <div>SCORE:<span className="score"></span></div>
+                  <div className="hand" ></div>
+              </div>
+              <div id="action">
+                  {!gameOver && !beginGame && <Button  onClick={battle}>Fight</Button>}
+              </div>
+            </div>
+          </div>
     </div>
-</div>
-
-        </div>
-      )
+  )
 }
 
 const ExpiredNotice = () => {
@@ -558,8 +525,14 @@ const CountdownTimer = (props) => {
   const [days, hours, minutes, seconds] = useCountdown(props.targetDate);
 
   if (days + hours + minutes + seconds <= 0) {
-    props.handleTimerExpired()
-    return <ExpiredNotice />;
+    return (
+      <>
+        <ExpiredNotice />
+        <Button onClick={props.onTimerExpired}>
+          Click To Show Results!
+        </Button>
+    </>
+  );
   } else {
     return (
       <ShowCounter

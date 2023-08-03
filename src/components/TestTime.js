@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 // import CountdownTimer from './CountdownTimer';
 import { useSelector, useDispatch } from 'react-redux'
 import DateTimeDisplay from './DateTimeDisplay';
@@ -33,6 +33,8 @@ const TestTime = () => {
   //const MINUTES_TO_ADD = 60000 * gametime  // 3 minute
   const MINUTES_TO_ADD = 60000 * .1  // 3 minute
 
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+
 const handleStartClick = () => {
     
     if (firstRun){
@@ -46,7 +48,9 @@ const handleStartClick = () => {
         if (!timerExpired)
         {
           timerExpired = true
-          winState = 1
+          //winState = 1
+          setWinState(1)
+          // forceUpdate()
           console.log(`Timer Expired winState: ${winState}\n`)
   
         }
@@ -56,7 +60,8 @@ const handleStartClick = () => {
       return (
         <>
           <div className='my-4 text-center'>
-                {!firstRun && <CountdownTimer targetDate={dateTime} timerExpiredHandler={timerExpiredHandler} />} <br />
+                {!firstRun && <CountdownTimer targetDate={dateTime} timerExpiredHandler={() => timerExpiredHandler()} />} <br />
+                winState = {winState} 
           </div>
           <Button  onClick={handleStartClick}>Simulate Play</Button>
 
@@ -98,8 +103,15 @@ const CountdownTimer = (props) => {
   const [days, hours, minutes, seconds] = useCountdown(props.targetDate);
 
   if (days + hours + minutes + seconds <= 0) {
-    props.timerExpiredHandler()
-    return <ExpiredNotice />;
+    let ext = props.timerExpiredHandler
+    return (
+      <>
+    <ExpiredNotice />
+    <Button onClick={props.timerExpiredHandler}>
+    Show
+  </Button>
+  </>
+    );
   } else {
     return (
       <ShowCounter

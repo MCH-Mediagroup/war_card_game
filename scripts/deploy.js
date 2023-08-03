@@ -21,7 +21,7 @@ async function main() {
   const COST = ethers.utils.parseUnits("1", "ether") // 1 ETH
 
   const DEPLOY_TIME = new Date().getTime();
-  let accounts, deployer, user1, saletime, user2, user3, player
+  let accounts, deployer, player1, player2
 
   // Deploy Token
   const Token = await hre.ethers.getContractFactory("Token")
@@ -53,7 +53,8 @@ async function main() {
   // Configure Accounts
   accounts = await ethers.getSigners()
   deployer = accounts[0]
-  player = accounts[1]
+  player1 = accounts[1]
+  player2 = accounts[2]
 
   // Fetch network
   const { chainId } = await ethers.provider.getNetwork()
@@ -61,20 +62,24 @@ async function main() {
   console.log(`Fetching token and transferring to accounts...\n`)
 
   //token = await ethers.getContractAt('Token', config[chainId].token.address)
-  console.log(`Player Address: ${player.address}\n`)
+  console.log(`Player1 Address: ${player1.address}\n`)
+  console.log(`Player2 Address: ${player2.address}\n`)
 
-
-
-  // Send tokens to player
+  // Send tokens to player1
   let amount = tokens(50)
-  transaction = await wargame.connect(player).payPlayer(amount, { value: ether(0) })
+  transaction = await wargame.connect(player1).payPlayer(amount, { value: ether(0) })
+  await transaction.wait()
+
+  // Send tokens to player2
+  transaction = await wargame.connect(player2).payPlayer(amount, { value: ether(0) })
   await transaction.wait()
   
-  console.log(`Player Amount: ${ await token.balanceOf(player.address)}\n`)
+  console.log(`Player1 Amount: ${ await token.balanceOf(player1.address)}\n`)
+  console.log(`Player2 Amount: ${ await token.balanceOf(player2.address)}\n`)
 
     // Deploy NFT
-    NAME = "MCH Generated NFT"
-    SYMBOL = "MCHNFT"
+    NAME = "MCH Generated Wargame NFT"
+    SYMBOL = "WARGNFT"
   
     const NFT = await hre.ethers.getContractFactory("NFT")
     const nft = await NFT.deploy(NAME, SYMBOL, COST)
