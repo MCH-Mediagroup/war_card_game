@@ -24,6 +24,9 @@ const TestTime = () => {
   const [firstRun, setFirstRun] = useState(true)
   let [timerExpired, setTimerExpired] = useState(false)
 
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(true);
+
   let [winState, setWinState] = useState(0)
   const dispatch = useDispatch()
 
@@ -34,13 +37,33 @@ const TestTime = () => {
   const [counter, setCounter] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCounter((prevCounter) => prevCounter + 1);
-    }, 1000);
+    let timeoutId = null;
 
-    return () => clearInterval(interval);
-  }, []);
+    if (isRunning) {
+      // Set up the timeout
+      timeoutId = setTimeout(() => {
+        setTime(time + 1);
+      }, 1000); // set timer to 1 second
+    }
 
+     // Clear the timeout if the component is unmounted
+     return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [time, isRunning]); // Re-run the effect when the time or isRunning state changes
+
+  const stopTimer = () => {
+    setIsRunning(false);
+  };
+  const startTimer = () => {
+    setIsRunning(true);
+  };
+  const restartTimer = () => {
+    setTime(0);
+    setIsRunning(true);
+  };
 
 const handleStartClick = () => {
     
@@ -62,25 +85,17 @@ const handleStartClick = () => {
   
         }
       }
-      const time = new Date();
-  time.setSeconds(time.getSeconds() + 15); // 10 minutes timer
-//   function rounds(a) {
-//     var timer;
-//     var r = 0;
-//     r = a;
-//     timer = setInterval(function () {
-        
-//     }, 100);
-// }
       return (
         <>
           <div className='my-4 text-center'>
                 {!firstRun && <CountdownTimer targetDate={dateTime} timerExpiredHandler={() => timerExpiredHandler()} />} <br />
                 winState = {winState} 
-                <div className="App">
-      <h1>Counter: {counter}</h1>
-      <Button onClick={clearInterval()}>Clear Interval</Button>
-    </div>
+                  <div>
+                     <p>Elapsed time: {time} seconds</p>
+                     <button onClick={stopTimer}>Stop timer</button>
+                     <button onClick={startTimer}>Start timer</button>
+                     <button onClick={restartTimer}>Restart timer</button>
+                  </div>
           </div>
           <Button  onClick={handleStartClick}>Simulate Play</Button>
 

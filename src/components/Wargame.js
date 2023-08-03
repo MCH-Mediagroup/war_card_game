@@ -19,15 +19,13 @@ import './War.css';
 import {
   payPlayer,
   loadBalances,
-  loadAccount,
   withdrawTokens,
-  saveGameOver,
-  savePlayGame,
-  saveWinStatus
 } from '../store/interactions'
 
 
 const Wargame = () => {
+
+  // Get state variables from redux
   const provider = useSelector(state => state.provider.connection)
   const account = useSelector(state => state.provider.account)
 
@@ -37,8 +35,6 @@ const Wargame = () => {
   const wargameBalance = useSelector(state => state.wargame.balance)
   const playerBalance = useSelector(state => state.tokens.balances)
   const gametime = useSelector(state => state.wargame.gametime)
-  const playgame = useSelector(state => state.wargame.playgame)
-  const winstatus = useSelector(state => state.wargame.winstatus)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
@@ -46,34 +42,44 @@ const Wargame = () => {
   const isSuccessPaying = useSelector(state => state.wargame.paying.isSuccess)
   const payTransactionHash = useSelector(state => state.wargame.paying.transactionHash)
 
-  const [dateTime, setDateTime] = useState(0)
-
+  // Gameplay variables
   let [beginGame, setBeginGame] = useState(true)
   const [isBetting, setIsBetting] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasBet, setHasBet] = useState(false)
 
-  const [showAlert, setShowAlert] = useState(false)
 
-  let [timerExpired, setTimerExpired] = useState(false)
   let [gameOver, setGameOver] = useState(false)
 
   let [winState, setWinState] = useState(0)
+  let [data, setCards] = useState([])
+  let player1Cards = 0
+  let player2Cards = 0
 
-  let [player1Cards, setPlayer1Cards] = useState(0)
-  let [player2Cards, setPlayer2Cards] = useState(0)
+  // let [player1Cards, setPlayer1Cards] = useState(0)
+  // let [player2Cards, setPlayer2Cards] = useState(0)
+
+  //Token variables
   let [playerTokens, setPlayerTokens] = useState(0)
   let [gameTokens, setGameTokens] = useState(0)
   let [tokenAmount, setTokenAmount] = useState(0)
   let [tokenMultiplier, setTokenMultiplier] = useState(1)
 
-  let [data, setCards] = useState([])
 
-
-  const dispatch = useDispatch()
-      // Fetch Countdown
+  // Timer variables
+  let [timerExpired, setTimerExpired] = useState(false)
+  const [dateTime, setDateTime] = useState(0)
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(true);
+  // Fetch Countdown
   const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
   // const MINUTES_TO_ADD = 60000 * .25  // testing
+
+
+  // General variables
+  const [showAlert, setShowAlert] = useState(false)
+  const dispatch = useDispatch()
+
   const fetchCardData = () => {
     fetch("http://192.168.254.133:5050/api/Cards/getcards")
       .then(res => res.json())
@@ -82,158 +88,181 @@ const Wargame = () => {
         })
       }
 
-      useEffect(() => {
+    useEffect(() => {
         fetchCardData()
     }, []);
 
-  const loadInitialData = async () => {
-
-    console.log(`Total Game Tokens available: ${wargameBalance}\n`)
-
-}
-
-const isBettingHandler = async () => {
-  setIsBetting(true)
-}
-const cancelBetHandler = async () => {
-  setIsBetting(false)
-}
-const betHandler = async (e) => {
-  e.preventDefault()
-  setShowAlert(false)
+    // useEffect(() => {
+    //   let timeoutId = null;
   
-
-
-  console.log(`TokenAmount : ${tokenAmount}\n`)
-
-
-  console.log(`Account : ${account}\n`)
-
-  await withdrawTokens(provider, wargame, tokens, tokenAmount, dispatch)
-
-  await loadBalances(tokens, account, dispatch)
-
-  setGameTokens(Number(tokenAmount))
-
-  setTokenMultiplier(2)
-  tokenMultiplier = 2
-
-  console.log(`Game Tokens betting : ${gameTokens} with multiplier: ${tokenMultiplier}\n`)
-
-  setPlayerTokens(0)
-
-  setHasBet(true)
-
-  setShowAlert(true)
-
-
-}
-
-const amountHandler = async (e) => {
-    setTokenAmount(e.target.value)
-}
-
-const handleStartClick = () => {
- 
-  if (beginGame){
-      setBeginGame(false);
-      setDateTime(Date.now() + (MINUTES_TO_ADD))
+    //   if (isRunning) {
+    //     // Set up the timeout
+    //     timeoutId = setTimeout(() => {
+    //       setTime(time + 1);
+    //     }, 1000); // set timer to 1 second
+    //   }
+  
+    //    // Clear the timeout if the component is unmounted
+    //    return () => {
+    //     if (timeoutId) {
+    //       clearTimeout(timeoutId);
+    //     }
+    //   };
+    // }, [time, isRunning]); // Re-run the effect when the time or isRunning state changes
+  
+    const stopTimer = () => {
+      setIsRunning(false);
+    };
+    const startTimer = () => {
+      setIsRunning(true);
+    };
+    const restartTimer = () => {
+      setTime(0);
+      setIsRunning(true);
+    };
+  
+    const isBettingHandler = async () => {
+      setIsBetting(true)
+    }
+    const cancelBetHandler = async () => {
+      setIsBetting(false)
+    }
+    const betHandler = async (e) => {
+      e.preventDefault()
+      setShowAlert(false)
       
+
+
+      console.log(`TokenAmount : ${tokenAmount}\n`)
+
+
+      console.log(`Account : ${account}\n`)
+
+      await withdrawTokens(provider, wargame, tokens, tokenAmount, dispatch)
+
+      await loadBalances(tokens, account, dispatch)
+
+      setGameTokens(Number(tokenAmount))
+
+      setTokenMultiplier(2)
+      tokenMultiplier = 2
+
+      console.log(`Game Tokens betting : ${gameTokens} with multiplier: ${tokenMultiplier}\n`)
+
+      setPlayerTokens(0)
+
+      setHasBet(true)
+
+      setShowAlert(true)
+
+
     }
 
-};
-let totalTokensWon = 0;
+    const amountHandler = async (e) => {
+        setTokenAmount(e.target.value)
+    }
 
-const winnerHandler = () => {
-  switch( winState ) {
-    case 1: // Win before timer expires
-      totalTokensWon = (gameTokens + 100) * tokenMultiplier;
-      break;
-    case 2: // Win after timer expires
-      totalTokensWon = (gameTokens + 50) * tokenMultiplier;
-      break;
-    case 3: // Draw
-      totalTokensWon = gameTokens;
-      break;
-    default: // Lose
-      totalTokensWon = 0;
-      break
-  }
-  setPlayerTokens(totalTokensWon)
-  playerTokens = totalTokensWon
-  console.log(`Player Tokens: ${playerTokens}\n`)
+    const handleStartClick = () => {
+    
+      if (beginGame){
+          setBeginGame(false);
+          setDateTime(Date.now() + (MINUTES_TO_ADD))
+          
+        }
 
+    };
+    let totalTokensWon = 0;
 
-
-
-}
-const timerExpiredHandler = () => {
-  if (!timerExpired)
-  {
-
-    let timerExpired = true
-    setTimerExpired(timerExpired)
-
-    let gameover = true
-    setGameOver(gameover)
-
-    // let winState = 0
-    if (player2Cards === player1Cards){
-      winState = 3} else
-    (winState = player1Cards > player2Cards ? 2 : 0)
-    setWinState(winState)
+    const winnerHandler = () => {
+      switch( winState ) {
+        case 1: // Win before timer expires
+          totalTokensWon = (gameTokens + 100) * tokenMultiplier;
+          break;
+        case 2: // Win after timer expires
+          totalTokensWon = (gameTokens + 50) * tokenMultiplier;
+          break;
+        case 3: // Draw
+          totalTokensWon = gameTokens;
+          break;
+        default: // Lose
+          totalTokensWon = 0;
+          break
+      }
+      setPlayerTokens(totalTokensWon)
+      playerTokens = totalTokensWon
+      console.log(`Player Tokens: ${playerTokens}\n`)
 
 
-    console.log(`Timer Expired winState: ${winState}\n`)
-    console.log(`Player1 Cards: ${player1Cards}\n`)
-    console.log(`Player2 Cards: ${player2Cards}\n`)
-   
-    winnerHandler()
-
-  }
-}
-
-const payPlayerHandler = async () => {
-  // e.preventDefault()
-
-  console.log(`Game Tokens before: ${gameTokens}\n`)
-  console.log(`Player Tokens before: ${playerTokens}\n`)
-  console.log(`Token multiplier before: ${tokenMultiplier}\n`)
 
 
-  setShowAlert(false)
-  console.log(`Winning State: ${winState}\n`)
-  console.log(`Total Player Tokens won: ${playerTokens}\n`)
-  // console.log(`Total Tokens won: ${totalTokensWon}\n`)
+    }
+    const timerExpiredHandler = () => {
+      if (!timerExpired)
+      {
 
-  // const _tokenAmount = playerTokens
+        let timerExpired = true
+        setTimerExpired(timerExpired)
 
-  playerTokens !== 0 && await payPlayer(
-      provider,
-      wargame,
-      playerTokens,
-      dispatch
-  )
+        let gameover = true
+        setGameOver(gameover)
 
-  await loadBalances(tokens, account, dispatch)
+        // let winState = 0
+        if (player2Cards === player1Cards){
+          winState = 3} else
+        (winState = player1Cards > player2Cards ? 2 : 0)
+        setWinState(winState)
 
-// reset player tokens
-setPlayerTokens(0)
-setGameTokens(0)
-playerTokens = 0
-gameTokens = 0
-setTokenAmount(0)
-setTokenMultiplier(1)
 
-setIsBetting(false)
-setHasBet(false)
-// setFirstRun(true)
+        console.log(`Timer Expired winState: ${winState}\n`)
+        console.log(`Player1 Cards: ${player1Cards}\n`)
+        console.log(`Player2 Cards: ${player2Cards}\n`)
+      
+        winnerHandler()
 
-console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
+      }
+    }
 
-setShowAlert(true)
+    const payPlayerHandler = async () => {
+      // e.preventDefault()
 
-}
+      console.log(`Game Tokens before: ${gameTokens}\n`)
+      console.log(`Player Tokens before: ${playerTokens}\n`)
+      console.log(`Token multiplier before: ${tokenMultiplier}\n`)
+
+
+      setShowAlert(false)
+      console.log(`Winning State: ${winState}\n`)
+      console.log(`Total Player Tokens won: ${playerTokens}\n`)
+      // console.log(`Total Tokens won: ${totalTokensWon}\n`)
+
+      // const _tokenAmount = playerTokens
+
+      playerTokens !== 0 && await payPlayer(
+          provider,
+          wargame,
+          playerTokens,
+          dispatch
+      )
+
+      await loadBalances(tokens, account, dispatch)
+
+    // reset player tokens
+    setPlayerTokens(0)
+    setGameTokens(0)
+    playerTokens = 0
+    gameTokens = 0
+    setTokenAmount(0)
+    setTokenMultiplier(1)
+
+    setIsBetting(false)
+    setHasBet(false)
+    // setFirstRun(true)
+
+    console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
+
+    setShowAlert(true)
+
+    }
 
     // Cards Game below this comment
 
