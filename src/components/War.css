@@ -73,7 +73,7 @@ body {
 
 .players {
     float: left;
-    width: 49%;
+    width: 50%;
     min-height: 300px;
     border: 1px solid #ddd;
 }
