@@ -19,7 +19,8 @@ import './War.css';
 import {
   payPlayer,
   loadBalances,
-  withdrawTokens,
+  saveTokenPile,
+  withdrawTokens
 } from '../store/interactions'
 
 
@@ -34,9 +35,6 @@ const Wargame = () => {
   const wargame = useSelector(state => state.wargame.contract)
   const wargameBalance = useSelector(state => state.wargame.balance)
   const playerBalance = useSelector(state => state.tokens.balances)
-  const gametime = useSelector(state => state.wargame.gametime)
-  const slowtime = useSelector(state => state.wargame.slowtime)
-  const playtime = useSelector(state => state.wargame.playtime)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
@@ -49,6 +47,7 @@ const Wargame = () => {
   const [isBetting, setIsBetting] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasBet, setHasBet] = useState(false)
+  const [isTokenPile, setIsTokenPile] = useState(false)
   // let [firstRun, setFirstRun] = useState(true)
 
 
@@ -78,6 +77,7 @@ const Wargame = () => {
   let [playerTokens, setPlayerTokens] = useState(0)
   let [gameTokens, setGameTokens] = useState(0)
   let [tokenAmount, setTokenAmount] = useState(0)
+  let [tokenPileAmount, setTokenPileAmount] = useState(0)
   let [tokenMultiplier, setTokenMultiplier] = useState(1)
 
 
@@ -111,7 +111,7 @@ const Wargame = () => {
     const playHandler = () => {
       battle();
     }
-    
+
     const autoPlayHandler = (props) => {
       if (!autoPlay)
       {
@@ -127,26 +127,41 @@ const Wargame = () => {
 
     }
  
+    const isTokenPileHandler = async () => {
+      setIsTokenPile(true)
+    }
+    const cancelTokenPileHandler = async () => {
+      setIsTokenPile(false)
+    }
     const isBettingHandler = async () => {
       setIsBetting(true)
     }
     const cancelBetHandler = async () => {
       setIsBetting(false)
     }
-    const betHandler = async (e) => {
+    const tokenPileHandler = async (e) => {
       e.preventDefault()
       setShowAlert(false)
       
-
-
-      console.log(`TokenAmount : ${tokenAmount}\n`)
-
+      console.log(`TokenPileAmount : ${tokenPileAmount}\n`)
 
       console.log(`Account : ${account}\n`)
 
-      await withdrawTokens(provider, wargame, tokens, tokenAmount, dispatch)
+      await withdrawTokens(provider, wargame, tokens, tokenPileAmount, dispatch)
 
       await loadBalances(tokens, account, dispatch)
+
+      saveTokenPile(Number(tokenPileAmount))
+
+      setIsTokenPile(true)
+
+      setShowAlert(true)
+
+    }
+    const betHandler = async (e) => {
+      e.preventDefault()
+      
+      console.log(`TokenBetAmount : ${tokenAmount}\n`)
 
       setGameTokens(Number(tokenAmount))
 
@@ -159,14 +174,14 @@ const Wargame = () => {
 
       setHasBet(true)
 
-      setShowAlert(true)
-
-
     }
 
     const amountHandler = async (e) => {
         setTokenAmount(e.target.value)
     }
+    const pileAmountHandler = async (e) => {
+      setTokenPileAmount(e.target.value)
+  }
 
     const handleStartClick = () => {
     
@@ -449,7 +464,41 @@ const Wargame = () => {
               </Row>
                 <Row>
                   <Col>
-                    <Form onSubmit={betHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
+                    <Form onSubmit={tokenPileHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
+                    { isBetting && !hasBet &&
+                    <div>
+                        <Row>
+                              <Form.Text className='text-end my-0' muted>
+                                  Balance: {playerBalance}
+                              </Form.Text>
+                              <InputGroup>
+                                  <Form.Control
+                                      type="number"
+                                      placeholder="0.0"
+                                      min="1.0"
+                                      max={playerBalance}
+                                      step="any"
+                                      id="token1"
+                                      onChange={(e) => pileAmountHandler(e)}
+                                      value={tokenPileAmount === 0 ? "" : tokenPileAmount}
+                                  />
+                                  <InputGroup.Text style={{ width: "100px" }} className="justify-content-center">
+                                      { symbols }
+                                  </InputGroup.Text>
+                              </InputGroup>
+                          </Row>
+                          <Row>
+                            <Button type="submit" className='m-2'>Put Them Into Your Pile!</Button>
+                            <Button onClick={cancelTokenPileHandler} className='m-2'>Cancel</Button>
+                          </Row>
+                      </div>
+                      }
+                      {!isBetting && !hasBet && beginGame && <Button  onClick={isTokenPileHandler} className='m-2'>Grab Some {symbols} Tokens From Wallet?</Button>}
+                      {/* {!isPlaying && !gameOver && hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>} */}
+                    </Form>
+                  </Col>
+                  <Col>
+                  <Form onSubmit={betHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
                     { isBetting && !hasBet &&
                     <div>
                         <Row>
@@ -473,20 +522,20 @@ const Wargame = () => {
                               </InputGroup>
                           </Row>
                           <Row>
-                            <Button type="submit" className='m-2'>Go For It!</Button>
+                            <Button type="submit" className='m-2'>Put Them Into Your Pile!</Button>
                             <Button onClick={cancelBetHandler} className='m-2'>Cancel</Button>
                           </Row>
                       </div>
                       }
-                      {!isBetting && !hasBet && beginGame && <Button  onClick={isBettingHandler} className='m-2'>Bet your {symbols} Tokens?</Button>}
+                      {!isBetting && !hasBet && beginGame && <Button  onClick={isBettingHandler} className='m-2'>Grab Some {symbols} Tokens From Wallet?</Button>}
                       {!isPlaying && !gameOver && hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>}
                     </Form>
+
                   </Col>
                   <Col>
-                  <div className='py-4'>
-                      <p className='text-center'><strong>Your {symbols} Total Balance:</strong> {playerBalance} {symbols}</p>
-                      <p className='text-center'><strong>Number of Tokens to play with:</strong> {playerTokens} {symbols}</p>
-                  </div>
+                    <div className='py-4'>
+                        <p className='text-center'><strong>Number of Tokens to play with:</strong> {playerTokens} {symbols}</p>
+                    </div>
                   </Col>
                 </Row>
               </>

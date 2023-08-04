@@ -18,11 +18,12 @@ import {
     setGameTime,
     setSlowTime,
     setPlayTime,
-    setPlayGame,
-    setGameOver,
-    setWinStatus,
-    setPlayer1Cards,
-    setPlayer2Cards,
+    setTokenPile,
+    // setPlayGame,
+    // setGameOver,
+    // setWinStatus,
+    // setPlayer1Cards,
+    // setPlayer2Cards,
     payPlayerRequest,
     payPlayerSuccess,
     payPlayerFail,
@@ -171,35 +172,35 @@ export const savePlayTime = async ( time, dispatch) => {
   dispatch(setPlayTime(time))
 
 }
+// // ------------------------------------------------------------------------------
+// // SET PLAY GAME
+// export const savePlayGame = async ( status, dispatch) => {
+//   dispatch(setPlayGame(status))
+
+// }
 // ------------------------------------------------------------------------------
-// SET PLAY GAME
-export const savePlayGame = async ( status, dispatch) => {
-  dispatch(setPlayGame(status))
+// SET GAME PILE
+export const saveTokenPile = ( status, dispatch) => {
+  dispatch(setTokenPile(status))
 
 }
-// ------------------------------------------------------------------------------
-// SET GAME OVER
-export const saveGameOver = ( status, dispatch) => {
-  dispatch(setGameOver(status))
+// // ------------------------------------------------------------------------------
+// // SET GAME OVER
+// export const saveWinStatus = ( status, dispatch) => {
+//   dispatch(setWinStatus(status))
 
-}
-// ------------------------------------------------------------------------------
-// SET GAME OVER
-export const saveWinStatus = ( status, dispatch) => {
-  dispatch(setWinStatus(status))
+// }
+// // ------------------------------------------------------------------------------
+// // SET NUMBER OF PLAYER CARDS
+// export const savePlayerCards = async ( player1, player2, dispatch) => {
+//   dispatch(setPlayer1Cards(player1))
+//   dispatch(setPlayer2Cards(player2))
+// }
+// // ------------------------------------------------------------------------------
+// // SET NUMBER OF PLAYER 2 CARDS
+// export const savePlayer2Cards = ( status, dispatch) => {
+//   dispatch(setPlayer2Cards(status))
 
-}
-// ------------------------------------------------------------------------------
-// SET NUMBER OF PLAYER CARDS
-export const savePlayerCards = async ( player1, player2, dispatch) => {
-  dispatch(setPlayer1Cards(player1))
-  dispatch(setPlayer2Cards(player2))
-}
-// ------------------------------------------------------------------------------
-// SET NUMBER OF PLAYER 2 CARDS
-export const savePlayer2Cards = ( status, dispatch) => {
-  dispatch(setPlayer2Cards(status))
-
-}
+// }
 
 
