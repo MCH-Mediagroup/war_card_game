@@ -9,6 +9,8 @@ import {
   saveWinStatus
 } from '../store/interactions'
 
+import './War.css';
+
 
 const TestTime = () => {
 
@@ -123,16 +125,10 @@ const handleStartClick = () => {
         <>
           <div className='my-4 text-center'>
                 {!firstRun && <CountdownTimer targetDate={dateTime} timerExpiredHandler={() => timerExpiredHandler()} />} <br />
-                winState = {winState} 
                   <div>
-                     {/* <p>Elapsed time: {time} seconds</p>
-                     <button onClick={stopTimer}>Stop timer</button>
-                     <button onClick={startTimer}>Start timer</button>
-                     <button onClick={restartTimer}>Restart timer</button> */}
+                    <BattleButton playHandler={() => playHandler()} />
                   </div>
-                  <div>
-                    <BattleButton autoPlayHandler={(autoPlay) => autoPlayHandler(autoPlay)} playHandler={() => playHandler()} />
-                  </div>
+                  winState = {winState} 
                   <div>
                     { autoPlay ? (
                       <p>Auto Play!</p>
@@ -168,9 +164,9 @@ const BattleButton = (props) => {
   }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
     return (
-      <>
+      <div className="battle-button">
         <Button disabled={isButtonDisabled} onClick={props.playHandler} >Battle</Button>
-      </>
+      </div>
     )
 }
 
@@ -178,7 +174,6 @@ const ExpiredNotice = () => {
   return (
     <div className="expired-notice">
       <span>Game Over!!!</span>
-      <p>Please select a future date and time.</p>
     </div>
   );
 };
@@ -211,8 +206,8 @@ const CountdownTimer = (props) => {
     return (
       <>
     <ExpiredNotice />
-    <Button onClick={props.timerExpiredHandler}>
-    Show
+    <Button className="show-results" onClick={props.timerExpiredHandler}>
+    Click To Show Results!
   </Button>
   </>
     );

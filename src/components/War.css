@@ -104,7 +104,27 @@ body {
 
 /* Begin Countdown Timer Styles */
 
+.battle-button {
+  position: relative;
+  height: 50px;
+  top: 0px;
+  bottom: 0px;
+  text-align: center;
+}
+.show-results {
+  position: relative;
+  height: 50px;
+  top: 50px;
+  bottom: 0px;
+  z-index: 1;
+}
+
+
 .expired-notice {
+    position: relative;
+    /* height: 150px; */
+    top: 0px;
+    z-index: 1;
     text-align: center;
     padding: 2rem;
     border: 1px solid #ebebeb;

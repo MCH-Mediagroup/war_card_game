@@ -45,10 +45,12 @@ const Wargame = () => {
   const payTransactionHash = useSelector(state => state.wargame.paying.transactionHash)
 
   // Gameplay variables
-  let [beginGame, setBeginGame] = useState(true)
+  const [beginGame, setBeginGame] = useState(true)
   const [isBetting, setIsBetting] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasBet, setHasBet] = useState(false)
+  // let [firstRun, setFirstRun] = useState(true)
+
 
 
   let [gameOver, setGameOver] = useState(false)
@@ -57,6 +59,17 @@ const Wargame = () => {
   let [data, setCards] = useState([])
   let player1Cards = 0
   let player2Cards = 0
+  let cards = data;
+  let players = [
+      [],
+      []
+  ];
+  let firstRun = true;
+  let p1 = document.querySelector("#player1 .hand");
+  let p2 = document.querySelector("#player2 .hand");
+  let s1 = document.querySelector("#player1 .score");
+  let s2 = document.querySelector("#player2 .score");
+
 
   // let [player1Cards, setPlayer1Cards] = useState(0)
   // let [player2Cards, setPlayer2Cards] = useState(0)
@@ -75,8 +88,8 @@ const Wargame = () => {
   const [play, setPlay] = useState(false);
 
   // Fetch Countdown
-  const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
-  // const MINUTES_TO_ADD = 60000 * .25  // testing
+  // const MINUTES_TO_ADD = 60000 * gametime  // default is 1 minute
+  const MINUTES_TO_ADD = 60000 * .25  // testing
 
 
   // General variables
@@ -96,11 +109,9 @@ const Wargame = () => {
     }, []);
 
     const playHandler = () => {
-      // setPlay(true);
       battle();
-      // console.log(`Play winState: ${winState}\n`)
-
     }
+    
     const autoPlayHandler = (props) => {
       if (!autoPlay)
       {
@@ -115,7 +126,6 @@ const Wargame = () => {
       }
 
     }
-
  
     const isBettingHandler = async () => {
       setIsBetting(true)
@@ -167,6 +177,27 @@ const Wargame = () => {
         }
 
     };
+
+    const handlePlayAgainClick = () => {
+    
+      if (gameOver){
+          setBeginGame(true);
+          // setFirstRun(true);
+          firstRun = true;
+          setGameOver(false);
+          setTimerExpired(false);
+          players[0].length = 0;
+          players[1].length = 0;
+          player1Cards = 0;
+          player2Cards = 0;
+          p1.innerHTML = "";
+          p2.innerHTML = "";
+          s1.innerHTML = "";
+          s2.innerHTML = "";
+          fetchCardData();
+        }
+
+    };
     let totalTokensWon = 0;
 
     const winnerHandler = () => {
@@ -186,11 +217,7 @@ const Wargame = () => {
       }
       setPlayerTokens(totalTokensWon)
       playerTokens = totalTokensWon
-      console.log(`Player Tokens: ${playerTokens}\n`)
-
-
-
-
+      // console.log(`Player Tokens: ${playerTokens}\n`)
     }
     const timerExpiredHandler = () => {
       if (!timerExpired)
@@ -199,10 +226,9 @@ const Wargame = () => {
         let timerExpired = true
         setTimerExpired(timerExpired)
 
-        let gameover = true
-        setGameOver(gameover)
+        gameOver = true
+        setGameOver(gameOver)
 
-        // let winState = 0
         if (player2Cards === player1Cards){
           winState = 3} else
         (winState = player1Cards > player2Cards ? 2 : 0)
@@ -210,6 +236,7 @@ const Wargame = () => {
 
 
         console.log(`Timer Expired winState: ${winState}\n`)
+        console.log(`Timer Expired Game Over State: ${gameOver}\n`)
         console.log(`Player1 Cards: ${player1Cards}\n`)
         console.log(`Player2 Cards: ${player2Cards}\n`)
       
@@ -262,135 +289,164 @@ const Wargame = () => {
 
     // Cards Game below this comment
 
-    var cards = data;
-    var players = [
-        [],
-        []
-    ];
-    var firstRun = true;
-    //var gameover = false;
-    var timer;
-    var r = 0;
-    // var fightButton = document.querySelector("#btnBattle");
+    // game functions
 
-    var p1 = document.querySelector("#player1 .hand");
-    var p2 = document.querySelector("#player2 .hand");
-    var s1 = document.querySelector("#player1 .score");
-    var s2 = document.querySelector("#player2 .score");
+      function battle() {
+          if (firstRun) {
+              firstRun = false;
+              dealCards(cards);
+          }
+          attack();
+      }
 
-    
-              //functions
-    
-            function battle() {
-                if (timer) {
-                    r--;
-                    outputMessage("Rounds left " + r);
-                    if (r < 1) {
-                        window.clearInterval(timer);
-                    }
-                }
-                if (firstRun) {
-                    firstRun = false;
-                    // buildCards();
-                    // shuffleArray(cards);
-                    dealCards(cards);
-                    // setIsPlaying(true)
-                }
-                attack();
-            }
-    
-            function attack() {
-                if (!gameOver) {
-                    var card1 = players[0].shift();
-                    var card2 = players[1].shift();
-                    var pot = [card1, card2];
-                    p1.innerHTML = showCard(card1, 0);
-                    p2.innerHTML = showCard(card2, 0);
-                    checkWinner(card1, card2, pot);
-                    s1.innerHTML = players[0].length; 
-                    s2.innerHTML = players[1].length; 
-                    player1Cards = players[0].length; 
-                    player2Cards = players[1].length; 
-                } else {
-                    outputMessage("Game over");
-                }
-            }
-    
-            function outputMessage(message) {
-                document.getElementById("message").innerHTML = message;
-            }
-    
-            function checkWinner(card1, card2, pot) {
-                if ((players[0].length <= 4) || (players[1].length <= 4)) {
-                    let gameover = true;
-                    setGameOver(gameover)
-                    let winState = (
-                        (players[1].length <= 4) ? (
-                            1
-                        ) : players[1].length === players[0].length ? (
-                            3
-                        ) : 0
-                    )
-                    setWinState(winState)
+      function attack() {
+          if (!gameOver) {
+              var card1 = players[0].shift();
+              var card2 = players[1].shift();
+              var pot = [card1, card2];
+              p1.innerHTML = showCard(card1, 0);
+              p2.innerHTML = showCard(card2, 0);
+              checkWinner(card1, card2, pot);
+              s1.innerHTML = players[0].length; 
+              s2.innerHTML = players[1].length; 
+              player1Cards = players[0].length; 
+              player2Cards = players[1].length; 
+          } else {
+              outputMessage("Game over");
+          }
+      }
 
-                    winnerHandler()
+      function outputMessage(message) {
+          document.getElementById("message").innerHTML = message;
+      }
 
-                    return;
-                }
-                if (card1.cardValue > card2.cardValue) {
-                    outputMessage("Player 1 wins");
-                    players[0] = players[0].concat(pot);
-                }
-                else if (card1.cardValue < card2.cardValue) {
-                    outputMessage("Player 2 wins");
-                    players[1] = players[1].concat(pot);
-                } else {
-                    battlemode(pot);
-                    outputMessage("Battle Mode");
-                }
-            }
-    
-            function battlemode(pot) {
-                var card1, card2;
-                var pos = (pot.length / 2);
-                if ((players[0].length < 4) || (players[1].length < 4)) {
-                    return;
-                } else {
-                    for (var i = 0; i < 4; i++) {
-                        card1 = players[0].shift();
-                        pot = pot.concat(card1);
-                        p1.innerHTML += showCard(card1, (pos + i));
-                    }
-                    for (i = 0; i < 4; i++) {
-                        card2 = players[1].shift();
-                        pot = pot.concat(card2);
-                        p2.innerHTML += showCard(card2, (pos + i));
-                    }
-                    checkWinner(card1, card2, pot);
-                }
-            }
-    
-            function showCard(c, p) {
-                var move = p * 40;
-                //var bgColor = (c.icon == "H" || c.icon == "D") ? "red" : "black";
-                var bCard = '<div class="icard ' + c.suit + ' " style="left:' + move + 'px">';
-                bCard += '<div class="cardtop suit">' + c.num + '<br></div>';
-                bCard += '<div class="cardmid suit"></div>';
-                bCard += '<div class="cardbottom suit">' + c.num + '<br></div></div>';
-                return bCard;
-            }
-   
-            function dealCards(array) {
-                for (var i = 0; i < array.length; i++) {
-                    var m = i % 2;
-                    players[m].push(array[i]);
-                }
-            }
+      function checkWinner(card1, card2, pot) {
+          if ((players[0].length <= 4) || (players[1].length <= 4)) {
+              let gameover = true;
+              setGameOver(gameover)
+              let winState = (
+                  (players[1].length <= 4) ? (
+                      1
+                  ) : players[1].length === players[0].length ? (
+                      3
+                  ) : 0
+              )
+              setWinState(winState)
+
+              winnerHandler()
+
+              return;
+          }
+          if (card1.cardValue > card2.cardValue) {
+              outputMessage("Player 1 wins");
+              players[0] = players[0].concat(pot);
+          }
+          else if (card1.cardValue < card2.cardValue) {
+              outputMessage("House wins");
+              players[1] = players[1].concat(pot);
+          } else {
+              battlemode(pot);
+              outputMessage("Battle Mode");
+          }
+      }
+
+      function battlemode(pot) {
+          var card1, card2;
+          var pos = (pot.length / 2);
+          if ((players[0].length < 4) || (players[1].length < 4)) {
+              return;
+          } else {
+              for (var i = 0; i < 4; i++) {
+                  card1 = players[0].shift();
+                  pot = pot.concat(card1);
+                  p1.innerHTML += showCard(card1, (pos + i));
+              }
+              for (i = 0; i < 4; i++) {
+                  card2 = players[1].shift();
+                  pot = pot.concat(card2);
+                  p2.innerHTML += showCard(card2, (pos + i));
+              }
+              checkWinner(card1, card2, pot);
+          }
+      }
+
+      function showCard(c, p) {
+          var move = p * 40;
+          //var bgColor = (c.icon == "H" || c.icon == "D") ? "red" : "black";
+          var bCard = '<div class="icard ' + c.suit + ' " style="left:' + move + 'px">';
+          bCard += '<div class="cardtop suit">' + c.num + '<br></div>';
+          bCard += '<div class="cardmid suit"></div>';
+          bCard += '<div class="cardbottom suit">' + c.num + '<br></div></div>';
+          return bCard;
+      }
+
+      function dealCards(array) {
+          for (var i = 0; i < array.length; i++) {
+              var m = i % 2;
+              players[m].push(array[i]);
+          }
+      }
     
       return (
         <div>
             {account ? (
               <>
+              <Row>
+                <Col>
+                <div className='my-0 text-center'>
+                  {beginGame ? (
+                          <h1 className='my-0 text-center'>Let's Play War!</h1>
+                      ) : (!beginGame && !gameOver) ? (
+                          <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
+                     ) : (!beginGame && gameOver) && (
+                        <div className='my-0 text-center'>
+                            <Row>
+                                <Col>
+                                    <div className='my-1 text-center'>
+                                        <h3>Total {symbols} Tokens Won : {playerTokens}</h3>
+                                    </div>
+
+                                    {playerTokens > 0 && (<div className='my-1 text-center'>
+                                        <Button  onClick={payPlayerHandler}>Pocket Winnings!</Button>
+                                    </div>)}
+                                </Col>
+                            </Row>
+                          </div>
+                     )
+                  }
+                  <div className='mb-0 text-center'>
+                     {/* {!gameOver && !beginGame && <Button  onClick={battle}>Fight</Button>} */}
+                     {!gameOver && !beginGame &&  <BattleButton playHandler={() => playHandler()} />}
+                  </div>
+
+                </div>
+
+                <div className='my-1 text-center'>
+                  {beginGame && 
+                  <Button  onClick={handleStartClick} className='mt-2'>Begin Game</Button>} <br />
+                  {gameOver && 
+                  <Button  onClick={handlePlayAgainClick} className='mb-3'>Play Again?</Button>} <br />
+                </div>
+
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <div id="wrapper">
+                  <div id="message">Click Fight to Start Game</div>
+                    <div id="board">
+                      <div id="player1" className="players">
+                          <div>SCORE:<span className="score"></span></div>
+                          <div className="hand" ></div>
+                      </div>  
+                      <div id="player2" className="players">
+                          <div>SCORE:<span className="score"></span></div>
+                          <div className="hand" ></div>
+                      </div>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
                 <Row>
                   <Col>
                     <Form onSubmit={betHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
@@ -433,38 +489,6 @@ const Wargame = () => {
                   </div>
                   </Col>
                 </Row>
-                <div className='my-0 text-center'>
-                  {beginGame ? (
-                          <h1 className='my-4 text-center'>Let's Play War!</h1>
-                      ) : (!beginGame && !gameOver) ? (
-                          <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
-                     ) : (!beginGame && gameOver) && (
-                        <div className='my-4 text-center'>
-                            <Row>
-                                <Col>
-                                    <div className='my-4 text-center'>
-                                        <h3>Total {symbols} Tokens Won : {playerTokens}</h3>
-                                    </div>
-
-                                    {playerTokens > 0 && (<div className='my-4 text-center'>
-                                        <Button  onClick={payPlayerHandler}>Pocket Winnings!</Button>
-                                    </div>)}
-                                </Col>
-                            </Row>
-                          </div>
-                     )
-                  }
-                  <br />
-                </div>
-
-                <div className='my-4 text-center'>
-
-                  <Button  onClick={handleStartClick} className='my-4'>Begin Game</Button> <br />
-              </div>
-              <Row>
-                <Col>
-                </Col>
-              </Row>
               </>
               ) : (
                 <p
@@ -500,23 +524,6 @@ const Wargame = () => {
               ) : (
                   <></>
         )}
-        <div id="wrapper">
-          <div id="message">Click Fight to Start Game</div>
-            <div id="board">
-              <div id="player1" className="players">
-                  <div>SCORE:<span className="score"></span></div>
-                  <div className="hand" ></div>
-              </div>  
-              <div id="player2" className="players">
-                  <div>SCORE:<span className="score"></span></div>
-                  <div className="hand" ></div>
-              </div>
-              <div id="action">
-                  {/* {!gameOver && !beginGame && <Button  onClick={battle}>Fight</Button>} */}
-                  {!gameOver && !beginGame &&  <BattleButton playHandler={() => playHandler()} />}
-              </div>
-            </div>
-          </div>
     </div>
   )
 }
@@ -538,9 +545,9 @@ const BattleButton = (props) => {
   }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
     return (
-      <>
+      <div className="battle-button">
         <Button disabled={isButtonDisabled} onClick={props.playHandler} >Fight</Button>
-      </>
+      </div>
     )
 }
 
@@ -578,7 +585,7 @@ const CountdownTimer = (props) => {
     return (
       <>
         <ExpiredNotice />
-        <Button onClick={props.onTimerExpired}>
+        <Button className="show-results" onClick={props.onTimerExpired}>
           Click To Show Results!
         </Button>
     </>

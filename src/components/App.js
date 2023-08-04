@@ -69,7 +69,7 @@ function App() {
 
         <hr />
 
-        <Tabs />
+        {/* <Tabs /> */}
 
         <Routes>
           <Route exact path="/" element={<Wargame />} />
