@@ -19,15 +19,13 @@ import './War.css';
 import {
   payPlayer,
   loadBalances,
-  loadAccount,
   withdrawTokens,
-  saveGameOver,
-  savePlayGame,
-  saveWinStatus
 } from '../store/interactions'
 
 
-const TestGame = () => {
+const Testgame = () => {
+
+  // Get state variables from redux
   const provider = useSelector(state => state.provider.connection)
   const account = useSelector(state => state.provider.account)
 
@@ -37,8 +35,8 @@ const TestGame = () => {
   const wargameBalance = useSelector(state => state.wargame.balance)
   const playerBalance = useSelector(state => state.tokens.balances)
   const gametime = useSelector(state => state.wargame.gametime)
-  const playgame = useSelector(state => state.wargame.playgame)
-  const winstatus = useSelector(state => state.wargame.winstatus)
+  const slowtime = useSelector(state => state.wargame.slowtime)
+  const playtime = useSelector(state => state.wargame.playtime)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
@@ -46,34 +44,45 @@ const TestGame = () => {
   const isSuccessPaying = useSelector(state => state.wargame.paying.isSuccess)
   const payTransactionHash = useSelector(state => state.wargame.paying.transactionHash)
 
-  const [dateTime, setDateTime] = useState(0)
-
+  // Gameplay variables
   let [beginGame, setBeginGame] = useState(true)
   const [isBetting, setIsBetting] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasBet, setHasBet] = useState(false)
 
-  const [showAlert, setShowAlert] = useState(false)
 
-  let [timerExpired, setTimerExpired] = useState(false)
   let [gameOver, setGameOver] = useState(false)
 
   let [winState, setWinState] = useState(0)
+  let [data, setCards] = useState([])
+  let player1Cards = 0
+  let player2Cards = 0
 
-  let [player1Cards, setPlayer1Cards] = useState(0)
-  let [player2Cards, setPlayer2Cards] = useState(0)
+  // let [player1Cards, setPlayer1Cards] = useState(0)
+  // let [player2Cards, setPlayer2Cards] = useState(0)
+
+  //Token variables
   let [playerTokens, setPlayerTokens] = useState(0)
   let [gameTokens, setGameTokens] = useState(0)
   let [tokenAmount, setTokenAmount] = useState(0)
   let [tokenMultiplier, setTokenMultiplier] = useState(1)
 
-  let [data, setCards] = useState([])
 
+  // Timer variables
+  let [timerExpired, setTimerExpired] = useState(false)
+  const [dateTime, setDateTime] = useState(0)
+  const [autoPlay, setAutoPlay] = useState(false);
+  const [play, setPlay] = useState(false);
 
-  const dispatch = useDispatch()
-      // Fetch Countdown
+  // Fetch Countdown
   const MINUTES_TO_ADD = 60000 * gametime  // default is 3 minutes
   // const MINUTES_TO_ADD = 60000 * .25  // testing
+
+
+  // General variables
+  const [showAlert, setShowAlert] = useState(false)
+  const dispatch = useDispatch()
+
   const fetchCardData = () => {
     fetch("http://192.168.254.133:5050/api/Cards/getcards")
       .then(res => res.json())
@@ -82,158 +91,174 @@ const TestGame = () => {
         })
       }
 
-      useEffect(() => {
+    useEffect(() => {
         fetchCardData()
     }, []);
 
-  const loadInitialData = async () => {
+    const playHandler = () => {
+      // setPlay(true);
+      battle();
+      // console.log(`Play winState: ${winState}\n`)
 
-    console.log(`Total Game Tokens available: ${wargameBalance}\n`)
+    }
+    const autoPlayHandler = (props) => {
+      if (!autoPlay)
+      {
+        setAutoPlay(true);
+        setWinState(winState + 1)
 
-}
+        console.log(`Auto Play winState: ${winState}\n`)
 
-const isBettingHandler = async () => {
-  setIsBetting(true)
-}
-const cancelBetHandler = async () => {
-  setIsBetting(false)
-}
-const betHandler = async (e) => {
-  e.preventDefault()
-  setShowAlert(false)
-  
+      } else
+      {
+        setAutoPlay(false)
+      }
 
-
-  console.log(`TokenAmount : ${tokenAmount}\n`)
-
-
-  console.log(`Account : ${account}\n`)
-
-  await withdrawTokens(provider, wargame, tokens, tokenAmount, dispatch)
-
-  await loadBalances(tokens, account, dispatch)
-
-  setGameTokens(Number(tokenAmount))
-
-  setTokenMultiplier(2)
-  tokenMultiplier = 2
-
-  console.log(`Game Tokens betting : ${gameTokens} with multiplier: ${tokenMultiplier}\n`)
-
-  setPlayerTokens(0)
-
-  setHasBet(true)
-
-  setShowAlert(true)
-
-
-}
-
-const amountHandler = async (e) => {
-    setTokenAmount(e.target.value)
-}
-
-const handleStartClick = () => {
- 
-  if (beginGame){
-      setBeginGame(false);
-      setDateTime(Date.now() + (MINUTES_TO_ADD))
-      
     }
 
-};
-let totalTokensWon = 0;
-
-const winnerHandler = () => {
-  switch( winState ) {
-    case 1: // Win before timer expires
-      totalTokensWon = (gameTokens + 100) * tokenMultiplier;
-      break;
-    case 2: // Win after timer expires
-      totalTokensWon = (gameTokens + 50) * tokenMultiplier;
-      break;
-    case 3: // Draw
-      totalTokensWon = gameTokens;
-      break;
-    default: // Lose
-      totalTokensWon = 0;
-      break
-  }
-  setPlayerTokens(totalTokensWon)
-  playerTokens = totalTokensWon
-  console.log(`Player Tokens: ${playerTokens}\n`)
+ 
+    const isBettingHandler = async () => {
+      setIsBetting(true)
+    }
+    const cancelBetHandler = async () => {
+      setIsBetting(false)
+    }
+    const betHandler = async (e) => {
+      e.preventDefault()
+      setShowAlert(false)
+      
 
 
+      console.log(`TokenAmount : ${tokenAmount}\n`)
 
 
-}
-const timerExpiredHandler = () => {
-  if (!timerExpired)
-  {
+      console.log(`Account : ${account}\n`)
 
-    timerExpired = true
-    setTimerExpired(timerExpired)
+      await withdrawTokens(provider, wargame, tokens, tokenAmount, dispatch)
 
-    gameOver = true
-    setGameOver(gameOver)
+      await loadBalances(tokens, account, dispatch)
 
-    // let winState = 0
-    if (player2Cards === player1Cards){
-      winState = 3} else
-    (winState = player1Cards > player2Cards ? 2 : 0)
-    setWinState(winState)
+      setGameTokens(Number(tokenAmount))
 
+      setTokenMultiplier(2)
+      tokenMultiplier = 2
 
-    console.log(`Timer Expired winState: ${winState}\n`)
-    console.log(`Player1 Cards: ${player1Cards}\n`)
-    console.log(`Player2 Cards: ${player2Cards}\n`)
-   
-    winnerHandler()
+      console.log(`Game Tokens betting : ${gameTokens} with multiplier: ${tokenMultiplier}\n`)
 
-  }
-}
+      setPlayerTokens(0)
 
-const payPlayerHandler = async () => {
-  // e.preventDefault()
+      setHasBet(true)
 
-  console.log(`Game Tokens before: ${gameTokens}\n`)
-  console.log(`Player Tokens before: ${playerTokens}\n`)
-  console.log(`Token multiplier before: ${tokenMultiplier}\n`)
+      setShowAlert(true)
 
 
-  setShowAlert(false)
-  console.log(`Winning State: ${winState}\n`)
-  console.log(`Total Player Tokens won: ${playerTokens}\n`)
-  // console.log(`Total Tokens won: ${totalTokensWon}\n`)
+    }
 
-  // const _tokenAmount = playerTokens
+    const amountHandler = async (e) => {
+        setTokenAmount(e.target.value)
+    }
 
-  playerTokens !== 0 && await payPlayer(
-      provider,
-      wargame,
-      playerTokens,
-      dispatch
-  )
+    const handleStartClick = () => {
+    
+      if (beginGame){
+          setBeginGame(false);
+          setDateTime(Date.now() + (MINUTES_TO_ADD))
+          
+        }
 
-  await loadBalances(tokens, account, dispatch)
+    };
+    let totalTokensWon = 0;
 
-// reset player tokens
-setPlayerTokens(0)
-setGameTokens(0)
-playerTokens = 0
-gameTokens = 0
-setTokenAmount(0)
-setTokenMultiplier(1)
+    const winnerHandler = () => {
+      switch( winState ) {
+        case 1: // Win before timer expires
+          totalTokensWon = (gameTokens + 100) * tokenMultiplier;
+          break;
+        case 2: // Win after timer expires
+          totalTokensWon = (gameTokens + 50) * tokenMultiplier;
+          break;
+        case 3: // Draw
+          totalTokensWon = gameTokens;
+          break;
+        default: // Lose
+          totalTokensWon = 0;
+          break
+      }
+      setPlayerTokens(totalTokensWon)
+      playerTokens = totalTokensWon
+      console.log(`Player Tokens: ${playerTokens}\n`)
 
-setIsBetting(false)
-setHasBet(false)
-// setFirstRun(true)
 
-console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
 
-setShowAlert(true)
 
-}
+    }
+    const timerExpiredHandler = () => {
+      if (!timerExpired)
+      {
+
+        let timerExpired = true
+        setTimerExpired(timerExpired)
+
+        let gameover = true
+        setGameOver(gameover)
+
+        // let winState = 0
+        if (player2Cards === player1Cards){
+          winState = 3} else
+        (winState = player1Cards > player2Cards ? 2 : 0)
+        setWinState(winState)
+
+
+        console.log(`Timer Expired winState: ${winState}\n`)
+        console.log(`Player1 Cards: ${player1Cards}\n`)
+        console.log(`Player2 Cards: ${player2Cards}\n`)
+      
+        winnerHandler()
+
+      }
+    }
+
+    const payPlayerHandler = async () => {
+      // e.preventDefault()
+
+      console.log(`Game Tokens before: ${gameTokens}\n`)
+      console.log(`Player Tokens before: ${playerTokens}\n`)
+      console.log(`Token multiplier before: ${tokenMultiplier}\n`)
+
+
+      setShowAlert(false)
+      console.log(`Winning State: ${winState}\n`)
+      console.log(`Total Player Tokens won: ${playerTokens}\n`)
+      // console.log(`Total Tokens won: ${totalTokensWon}\n`)
+
+      // const _tokenAmount = playerTokens
+
+      playerTokens !== 0 && await payPlayer(
+          provider,
+          wargame,
+          playerTokens,
+          dispatch
+      )
+
+      await loadBalances(tokens, account, dispatch)
+
+    // reset player tokens
+    setPlayerTokens(0)
+    setGameTokens(0)
+    playerTokens = 0
+    gameTokens = 0
+    setTokenAmount(0)
+    setTokenMultiplier(1)
+
+    setIsBetting(false)
+    setHasBet(false)
+    // setFirstRun(true)
+
+    console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
+
+    setShowAlert(true)
+
+    }
 
     // Cards Game below this comment
 
@@ -297,23 +322,17 @@ setShowAlert(true)
     
             function checkWinner(card1, card2, pot) {
                 if ((players[0].length <= 4) || (players[1].length <= 4)) {
-                  // if ((players[0].length > 26) || (players[1].length > 26)) {
-                    gameOver = true;
-                    setGameOver(gameOver)
-                    winState = (
+                    let gameover = true;
+                    setGameOver(gameover)
+                    let winState = (
                         (players[1].length <= 4) ? (
                             1
                         ) : players[1].length === players[0].length ? (
                             3
                         ) : 0
                     )
-                    // winState = 1  //Testing
                     setWinState(winState)
 
-                    console.log(`Game Played winState: ${winState}\n`)
-                    console.log(`Player1 Cards: ${player1Cards}\n`)
-                    console.log(`Player2 Cards: ${player2Cards}\n`)
-                
                     winnerHandler()
 
                     return;
@@ -493,13 +512,38 @@ setShowAlert(true)
                   <div className="hand" ></div>
               </div>
               <div id="action">
-                  {!gameOver && !beginGame && <Button  onClick={battle}>Fight</Button>}
+                  {/* {!gameOver && !beginGame && <Button  onClick={battle}>Fight</Button>} */}
+                  {!gameOver && !beginGame &&  <BattleButton playHandler={() => playHandler()} />}
               </div>
             </div>
           </div>
     </div>
   )
 }
+const BattleButton = (props) => {
+  const slowtime = useSelector(state => state.wargame.slowtime)
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+  useEffect(() => {
+    // Set up the interval
+    const slowTime = slowtime * 1000
+    const intervalId = setInterval(() => {
+      setIsButtonDisabled(prevState => !prevState);
+    }, slowTime); // Toggle the disabled state of the button every 3 seconds
+
+    // Clear the interval if the component is unmounted
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+
+    return (
+      <>
+        <Button disabled={isButtonDisabled} onClick={props.playHandler} >Fight</Button>
+      </>
+    )
+}
+
 
 const ExpiredNotice = () => {
   return (
@@ -552,4 +596,4 @@ const CountdownTimer = (props) => {
 };
 
 
-export default TestGame
+export default Testgame
