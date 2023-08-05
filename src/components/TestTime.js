@@ -57,7 +57,20 @@ const TestTime = () => {
     // setIsButtonDisabled(true);
     setPlay(true);
   };
+  const [isDisabled, setIsDisabled] = useState(false);
 
+  const handleClick = () => {
+    // Do any action you want when the button is clicked
+    console.log('Button clicked!');
+
+    // Disable the button
+    setIsDisabled(true);
+
+    // Re-enable the button after 2 seconds (2000 milliseconds)
+    setTimeout(() => {
+      setIsDisabled(false);
+    }, 1000);
+  };
 
 const handleStartClick = () => {
     
@@ -126,7 +139,10 @@ const handleStartClick = () => {
           <div className='my-4 text-center'>
                 {!firstRun && <CountdownTimer targetDate={dateTime} timerExpiredHandler={() => timerExpiredHandler()} />} <br />
                   <div>
-                    <BattleButton playHandler={() => playHandler()} />
+                  <Button disabled={isDisabled} onClick={handleClick}>
+                    Click Me
+                  </Button>                    
+                  {/* <BattleButton playHandler={() => playHandler()} /> */}
                   </div>
                   winState = {winState} 
                   <div>

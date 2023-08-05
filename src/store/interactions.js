@@ -82,6 +82,9 @@ export const loadTokens = async (provider, chainId, dispatch) => {
   
     dispatch(setContract(wargame))
 
+    let intWarChest = 0
+    dispatch(setWarchest(intWarChest))
+
     return wargame
   }
 

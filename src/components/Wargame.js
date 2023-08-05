@@ -35,7 +35,9 @@ const Wargame = () => {
   const wargame = useSelector(state => state.wargame.contract)
   const wargameBalance = useSelector(state => state.wargame.balance)
   const playerBalance = useSelector(state => state.tokens.balances)
-  const warChest = useSelector(state => state.tokens.warchest)
+  const warchest = useSelector(state => state.tokens.warchest)
+  const gametime = useSelector(state => state.wargame.gametime)
+  const balance = useSelector(state => state.wargame.balance)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
@@ -81,17 +83,19 @@ const Wargame = () => {
   let [tokenAmount, setTokenAmount] = useState(0)
   let [warchestAmount, setWarchestAmount] = useState(0)
   let [tokenMultiplier, setTokenMultiplier] = useState(1)
-
+  let [warchestTokens, setWarchestTokens] = useState(0)
+  let displayTokens = 0
 
   // Timer variables
   let [timerExpired, setTimerExpired] = useState(false)
   const [dateTime, setDateTime] = useState(0)
   const [autoPlay, setAutoPlay] = useState(false);
   const [play, setPlay] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   // Fetch Countdown
-  // const MINUTES_TO_ADD = 60000 * gametime  // default is 1 minute
-  const MINUTES_TO_ADD = 60000 * .25  // testing
+   const MINUTES_TO_ADD = 60000 * gametime  // default is 1 minute
+  // const MINUTES_TO_ADD = 60000 * .25  // testing
 
 
   // General variables
@@ -108,10 +112,25 @@ const Wargame = () => {
 
     useEffect(() => {
         fetchCardData()
+        // setWarChestTokens(0)
+        // saveWarchest(warChestTokens, dispatch)
+        // console.log(`War Chest at beginning: ${warchest}\n`)
+        console.log(`War Chest Tokens at beginning: ${warchestTokens}\n`)
+        // console.log(`Slowtime at beginning: ${slowtime}\n`)
+        // console.log(`Balance at beginning: ${balance}\n`)
     }, []);
 
     const playHandler = () => {
+
       battle();
+
+    //   // Disable the button
+    // setIsDisabled(true);
+
+    // // Re-enable the button after 2 seconds (2000 milliseconds)
+    // setTimeout(() => {
+    //   setIsDisabled(false);
+    // }, 500);
     }
 
     const autoPlayHandler = (props) => {
@@ -145,7 +164,7 @@ const Wargame = () => {
       e.preventDefault()
       setShowAlert(false)
       
-      console.log(`War Chest Amount : ${warchestAmount}\n`)
+      console.log(`War Chest Amount to withdraw: ${warchestAmount}\n`)
 
       console.log(`Account : ${account}\n`)
 
@@ -153,9 +172,14 @@ const Wargame = () => {
 
       await loadBalances(tokens, account, dispatch)
 
-      saveWarchest(Number(warchestAmount))
+      //saveWarchest(Number(warchest + warchestAmount), dispatch)
+
+      let updateTokens = Number(warchestTokens + warchestAmount)
+      setWarchestTokens(updateTokens)
+      warchestTokens = updateTokens
 
       setHasWarchest(true)
+      setIsWarchest(false)
 
       setShowAlert(true)
 
@@ -166,6 +190,11 @@ const Wargame = () => {
       console.log(`TokenBetAmount : ${tokenAmount}\n`)
 
       setGameTokens(Number(tokenAmount))
+
+      let updateTokens = Number(warchestTokens - tokenAmount)
+      setWarchestTokens(updateTokens)
+      warchestTokens = updateTokens
+
 
       setTokenMultiplier(2)
       tokenMultiplier = 2
@@ -201,6 +230,7 @@ const Wargame = () => {
           setBeginGame(true);
           // setFirstRun(true);
           firstRun = true;
+          setIsDisabled(false)
           setGameOver(false);
           setTimerExpired(false);
           players[0].length = 0;
@@ -218,6 +248,13 @@ const Wargame = () => {
     let totalTokensWon = 0;
 
     const winnerHandler = () => {
+
+      // console.log(`War Chest Before: ${warchest}\n`)
+      console.log(`War Chest Tokens Before: ${warchestTokens}\n`)
+      console.log(`Winning State: ${winState}\n`)
+      console.log(`Game Tokens before: ${gameTokens}\n`)
+      console.log(`Token multiplier before: ${tokenMultiplier}\n`)
+
       switch( winState ) {
         case 1: // Win before timer expires
           totalTokensWon = (gameTokens + 100) * tokenMultiplier;
@@ -234,9 +271,58 @@ const Wargame = () => {
       }
       setPlayerTokens(totalTokensWon)
       playerTokens = totalTokensWon
-      // console.log(`Player Tokens: ${playerTokens}\n`)
+
+      displayTokens = totalTokensWon
+
+      //saveWarchest(Number(warchest + playerTokens), dispatch)
+      let updateTokens = Number(warchestTokens + playerTokens)
+      setWarchestTokens(updateTokens)
+      warchestTokens = updateTokens
+
+      if (warchestTokens > 0)
+      {
+        setHasWarchest(true)
+      }
+
+      console.log(`Computed Player Tokens: ${playerTokens}\n`)
+      console.log(`War Chest Tokens: ${warchestTokens}\n`)
+
+      // Reset all player amounts and flags
+      setPlayerTokens(0)
+      setGameTokens(0)
+      //playerTokens = 0
+      gameTokens = 0
+      //totalTokensWon = 0
+      setTokenAmount(0)
+      setTokenMultiplier(1)
+      setWinState(0)
+  
+      setIsBetting(false)
+      setHasBet(false)
+  
     }
     const gameWinnerHandler = () => {
+      let timerExpired = true
+      setTimerExpired(timerExpired)
+
+      gameOver = true
+      setGameOver(gameOver)
+      setIsDisabled(true)
+
+      // if (player2Cards === player1Cards){
+      //   winState = 3} else
+      // (winState = player2Cards <= 4 ? 1 : 0)
+
+      // setWinState(winState)
+
+      // winnerHandler()
+
+      console.log(`Game Winner winState: ${winState}\n`)
+      console.log(`Game Winner Game Over State: ${gameOver}\n`)
+      console.log(`Player1 Cards: ${player1Cards}\n`)
+      console.log(`Player2 Cards: ${player2Cards}\n`)
+    
+
     }
     const timerExpiredHandler = () => {
       if (!timerExpired)
@@ -247,6 +333,7 @@ const Wargame = () => {
 
         gameOver = true
         setGameOver(gameOver)
+        setIsDisabled(true)
 
         if (player2Cards === player1Cards){
           winState = 3} else
@@ -254,9 +341,11 @@ const Wargame = () => {
         setWinState(winState)
 
 
-        console.log(`Timer Expired winState: ${winState}\n`)
-        console.log(`Timer Expired Game Over State: ${gameOver}\n`)
-        console.log(`Player1 Cards: ${player1Cards}\n`)
+        console.log(`Timer Expired winState: ${winState}`)
+        console.log(`Timer Expired War Chest: ${warchest}`)
+        console.log(`Timer Expired War Chest Tokens: ${warchestTokens}`)
+        console.log(`Timer Expired Game Over State: ${gameOver}`)
+        console.log(`Player1 Cards: ${player1Cards}`)
         console.log(`Player2 Cards: ${player2Cards}\n`)
       
         winnerHandler()
@@ -267,40 +356,26 @@ const Wargame = () => {
     const payPlayerHandler = async () => {
       // e.preventDefault()
 
-      console.log(`Game Tokens before: ${gameTokens}\n`)
-      console.log(`Player Tokens before: ${playerTokens}\n`)
-      console.log(`Token multiplier before: ${tokenMultiplier}\n`)
-
+      console.log(`War Chest Tokens before: ${warchest}\n`)
 
       setShowAlert(false)
-      console.log(`Winning State: ${winState}\n`)
-      console.log(`Total Player Tokens won: ${playerTokens}\n`)
-      // console.log(`Total Tokens won: ${totalTokensWon}\n`)
 
-      // const _tokenAmount = playerTokens
-
-      playerTokens !== 0 && await payPlayer(
+      warchestTokens !== 0 && await payPlayer(
           provider,
           wargame,
-          playerTokens,
+          warchestTokens,
           dispatch
       )
 
       await loadBalances(tokens, account, dispatch)
 
-    // reset player tokens
-    setPlayerTokens(0)
-    setGameTokens(0)
-    playerTokens = 0
-    gameTokens = 0
-    setTokenAmount(0)
-    setTokenMultiplier(1)
-
-    setIsBetting(false)
-    setHasBet(false)
+    // reset war chest tokens
+    //saveWarchest(0, dispatch)
+    setHasWarchest(false)
+    setWarchestTokens(0)
     // setFirstRun(true)
 
-    console.log(`Total Player Tokens after reset: ${playerTokens}\n`)
+    console.log(`Total War Chest Tokens after reset: ${warchest}\n`)
 
     setShowAlert(true)
 
@@ -343,15 +418,16 @@ const Wargame = () => {
           if ((players[0].length <= 4) || (players[1].length <= 4)) {
               let gameover = true;
               setGameOver(gameover)
-              let winState = (
-                  (players[1].length <= 4) ? (
-                      1
-                  ) : players[1].length === players[0].length ? (
-                      3
-                  ) : 0
-              )
+              player1Cards = players[0].length; 
+              player2Cards = players[1].length; 
+              console.log(`Game Over Player1 Cards: ${player1Cards}\n`)
+              console.log(`Game Over Player2 Cards: ${player2Cards}\n`)
+              if (player2Cards === player1Cards){
+                winState = 3} else
+              (winState = player2Cards <= 4 ? 1 : 0)
+        
               setWinState(winState)
-
+        
               winnerHandler()
 
               return;
@@ -412,38 +488,46 @@ const Wargame = () => {
               <>
               <Row>
                 <Col>
-                </Col>
+                    <div className='py-4'>
+                        {warchestTokens > 0 && <p className='text-center'><strong></strong> {warchestTokens} {symbols} In War Chest</p>}
+                        {gameTokens > 0 && <p className='text-center'><strong>Number of Tokens playing with:</strong> {gameTokens} {symbols}</p>}
+                    </div>
+               </Col>
                 <Col>
                 <div className='my-0 text-center'>
                   {beginGame ? (
                           <h1 className='my-0 text-center'>Let's Play War!</h1>
                       ) : (!beginGame && !gameOver) ? (
-                          <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
-                     ) : (!beginGame && gameOver) && (
+                          <CountdownTimer targetDate={dateTime} warchestTokens = {warchest} onTimerExpired={() => timerExpiredHandler()} />
+                      ) : (gameOver && !beginGame && !timerExpired) ? (
+                            <>
+                              <ExpiredNotice />
+                              <Button className="show-results" onClick={gameWinnerHandler}>
+                                  Click To Show Results!
+                              </Button>
+                            </>
+                       ) : (!beginGame && gameOver) && (
                         <div className='my-0 text-center'>
                             <Row>
                                 <Col>
                                     <div className='my-1 text-center'>
-                                        <h3>Total {symbols} Won : {playerTokens}</h3>
+                                        <h5>Total {symbols} Won This Round : {displayTokens}</h5>
                                     </div>
 
-                                    {playerTokens > 0 && (<div className='my-1 text-center'>
+                                    {/* {playerTokens > 0 && (<div className='my-1 text-center'>
                                         <Button  onClick={payPlayerHandler}>Pocket Winnings!</Button>
-                                    </div>)}
+                                    </div>)} */}
                                 </Col>
                             </Row>
                           </div>
                      )
                   }
                   <div className='mb-0 text-center'>
-                     {/* {!gameOver && !beginGame && <Button  onClick={battle}>Fight</Button>} */}
-                     {!gameOver && !beginGame &&  <BattleButton playHandler={() => playHandler()} />}
-                     <Button className="show-results" onClick={gameWinnerHandler}>
-                        Click To Show Results!
-                     </Button>
-
+                     {/* {!gameOver && !beginGame &&  <BattleButton playHandler={() => playHandler()} />} */}
+                     {!gameOver && !beginGame &&  
+                        <Button disabled={isDisabled} onClick={playHandler} >Fight</Button>
+                     }
                   </div>
-
                 </div>
 
                 <div className='my-1 text-center'>
@@ -456,7 +540,7 @@ const Wargame = () => {
                 </Col>
                 <Col>
                 <div className='my-1 text-center'>
-                  {hasWarchest && warchestAmount > 0 && <Button  variant="success" onClick={payPlayerHandler} className='m-2'>Send {symbols} From Your War Chest to your Wallet?</Button>}
+                  {hasWarchest && warchestTokens > 0 && <Button  variant="success" onClick={payPlayerHandler} className='m-2'>Send {symbols} From Your War Chest to your Wallet?</Button>}
                 </div>
                 </Col>
               </Row>
@@ -478,6 +562,8 @@ const Wargame = () => {
                 </Col>
               </Row>
                 <Row>
+                  <Col>
+                  </Col>
                   <Col>
                     <Form onSubmit={warchestHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
                     { isWarchest && !hasWarchest &&
@@ -503,12 +589,12 @@ const Wargame = () => {
                               </InputGroup>
                           </Row>
                           <Row>
-                            <Button type="submit" className='m-2'>Put Them Into Your Pile!</Button>
+                            <Button type="submit" className='m-2'>Add Them To Your War Chest!</Button>
                             <Button onClick={cancelWarchestHandler} className='m-2'>Cancel</Button>
                           </Row>
                       </div>
                       }
-                      {!isWarchest && !hasWarchest && beginGame && <Button  variant="danger" onClick={isWarchestHandler} className='m-2'>Grab Some {symbols} From Wallet to add to your War Chest?</Button>}
+                      {!isWarchest && !hasWarchest && <Button  variant="danger" onClick={isWarchestHandler} className='m-2'>Grab Some {symbols} From Wallet to add to your War Chest?</Button>}
                       {/* {!isPlaying && !gameOver && hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>} */}
                     </Form>
                   </Col>
@@ -548,9 +634,6 @@ const Wargame = () => {
 
                   </Col>
                   <Col>
-                    <div className='py-4'>
-                        <p className='text-center'><strong>Number of Tokens to play with:</strong> {playerTokens} {symbols}</p>
-                    </div>
                   </Col>
                 </Row>
               </>
@@ -592,21 +675,29 @@ const Wargame = () => {
   )
 }
 const BattleButton = (props) => {
-  const slowtime = useSelector(state => state.wargame.slowtime)
+//   const slowtime = useSelector(state => state.wargame.slowtime)
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-  useEffect(() => {
-    // Set up the interval
-    const slowTime = slowtime * 1000
-    const intervalId = setInterval(() => {
-      setIsButtonDisabled(prevState => !prevState);
-    }, slowTime); // Toggle the disabled state of the button every 3 seconds
+//   useEffect(() => {
+//     // Set up the interval
+//     const slowTime = slowtime * 1000
+//     const intervalId = setInterval(() => {
+//       setIsButtonDisabled(prevState => !prevState);
+//     }, slowTime); // Toggle the disabled state of the button every 3 seconds
 
-    // Clear the interval if the component is unmounted
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+//     // Clear the interval if the component is unmounted
+//     return () => {
+//       clearInterval(intervalId);
+//     };
+//   }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+
+      // Disable the button
+      setIsButtonDisabled(true);
+
+    // Re-enable the button after 2 seconds (2000 milliseconds)
+    setTimeout(() => {
+      setIsButtonDisabled(false);
+    }, 500);
 
     return (
       <div className="battle-button">
@@ -644,8 +735,11 @@ const ShowCounter = ({ days, hours, minutes, seconds }) => {
 
 const CountdownTimer = (props) => {
   const [days, hours, minutes, seconds] = useCountdown(props.targetDate);
+  // const dispatch = useDispatch()
 
   if (days + hours + minutes + seconds <= 0) {
+    // console.log(`War Chest Tokens In Countdown: ${props.warChestTokens}\n`)
+    // saveWarchest(props.warChestTokens, dispatch)
     return (
       <>
         <ExpiredNotice />

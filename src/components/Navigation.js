@@ -17,6 +17,7 @@ const Navigation = () => {
   const account = useSelector(state => state.provider.account)
   const tokens = useSelector(state => state.tokens.contracts)
   const playerBalance = useSelector(state => state.tokens.balances)
+  const warchest = useSelector(state => state.wargame.warchest)
   const symbols = useSelector(state => state.tokens.symbols)
 
   const dispatch = useDispatch()
@@ -25,6 +26,8 @@ const Navigation = () => {
     const account = await loadAccount(dispatch)
    
         await loadBalances(tokens, account, dispatch)
+        console.log(`War Chest Tokens in Nav: ${warchest}\n`)
+
   }
 
   const networkHandler = async (e) => {
