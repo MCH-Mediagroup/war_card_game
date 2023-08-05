@@ -18,7 +18,7 @@ import {
     setGameTime,
     setSlowTime,
     setPlayTime,
-    setTokenPile,
+    setWarchest,
     // setPlayGame,
     // setGameOver,
     // setWinStatus,
@@ -180,8 +180,8 @@ export const savePlayTime = async ( time, dispatch) => {
 // }
 // ------------------------------------------------------------------------------
 // SET GAME PILE
-export const saveTokenPile = ( status, dispatch) => {
-  dispatch(setTokenPile(status))
+export const saveWarchest = ( status, dispatch) => {
+  dispatch(setWarchest(status))
 
 }
 // // ------------------------------------------------------------------------------

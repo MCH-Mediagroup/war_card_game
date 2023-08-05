@@ -13,7 +13,7 @@ export const wargame = createSlice({
     // winstatus: 0,
     // player1cards: 26,
     // player2cards: 26,
-    tokenpile: 0,
+    warchest: 0,
     paying: {
       isPaying: false,
       isSucccess: false,
@@ -42,8 +42,8 @@ export const wargame = createSlice({
     setPlayTime: (state, action) => {
       state.playtime = action.payload
     },
-    setTokenPile: (state, action) => {
-      state.tokenpile = action.payload
+    setWarchest: (state, action) => {
+      state.warchest = action.payload
     },
     // setPlayGame: (state, action) => {
     //   state.playgame = action.payload
@@ -99,7 +99,7 @@ export const {
   setGameTime,
   setSlowTime,
   setPlayTime,
-  setTokenPile,
+  setWarchest,
   // setPlayGame,
   // setGameOver,
   // setWinStatus,
