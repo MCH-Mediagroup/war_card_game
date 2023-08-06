@@ -19,7 +19,6 @@ import './War.css';
 import {
   payPlayer,
   loadBalances,
-  saveWarchest,
   withdrawTokens
 } from '../store/interactions'
 
@@ -33,11 +32,10 @@ const Wargame = () => {
   const tokens = useSelector(state => state.tokens.contracts)
   const symbols = useSelector(state => state.tokens.symbols)
   const wargame = useSelector(state => state.wargame.contract)
+  const gametime = useSelector(state => state.wargame.gametime)
   const wargameBalance = useSelector(state => state.wargame.balance)
   const playerBalance = useSelector(state => state.tokens.balances)
   const warchest = useSelector(state => state.tokens.warchest)
-  const gametime = useSelector(state => state.wargame.gametime)
-  const balance = useSelector(state => state.wargame.balance)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
@@ -84,7 +82,8 @@ const Wargame = () => {
   let [warchestAmount, setWarchestAmount] = useState(0)
   let [tokenMultiplier, setTokenMultiplier] = useState(1)
   let [warchestTokens, setWarchestTokens] = useState(0)
-  let displayTokens = 0
+  // let displayTokens = 0
+  let [displayTokens, setDisplayTokens] = useState(0)
 
   // Timer variables
   let [timerExpired, setTimerExpired] = useState(false)
@@ -112,12 +111,7 @@ const Wargame = () => {
 
     useEffect(() => {
         fetchCardData()
-        // setWarChestTokens(0)
-        // saveWarchest(warChestTokens, dispatch)
-        // console.log(`War Chest at beginning: ${warchest}\n`)
-        console.log(`War Chest Tokens at beginning: ${warchestTokens}\n`)
-        // console.log(`Slowtime at beginning: ${slowtime}\n`)
-        // console.log(`Balance at beginning: ${balance}\n`)
+        // console.log(`War Chest Tokens at beginning: ${warchestTokens}\n`)
     }, []);
 
     const playHandler = () => {
@@ -172,11 +166,12 @@ const Wargame = () => {
 
       await loadBalances(tokens, account, dispatch)
 
-      //saveWarchest(Number(warchest + warchestAmount), dispatch)
-
-      let updateTokens = Number(warchestTokens + warchestAmount)
+      let updateTokens = Number(warchestTokens + Number(warchestAmount))
       setWarchestTokens(updateTokens)
       warchestTokens = updateTokens
+      console.log(`Total War Chest Tokens after withdrawal: ${warchestTokens}\n`)
+
+      setWarchestAmount(0)
 
       setHasWarchest(true)
       setIsWarchest(false)
@@ -272,6 +267,7 @@ const Wargame = () => {
       setPlayerTokens(totalTokensWon)
       playerTokens = totalTokensWon
 
+      setDisplayTokens(totalTokensWon)
       displayTokens = totalTokensWon
 
       //saveWarchest(Number(warchest + playerTokens), dispatch)
@@ -282,6 +278,9 @@ const Wargame = () => {
       if (warchestTokens > 0)
       {
         setHasWarchest(true)
+      } else
+      {
+        setHasWarchest(false)
       }
 
       console.log(`Computed Player Tokens: ${playerTokens}\n`)
@@ -342,7 +341,6 @@ const Wargame = () => {
 
 
         console.log(`Timer Expired winState: ${winState}`)
-        console.log(`Timer Expired War Chest: ${warchest}`)
         console.log(`Timer Expired War Chest Tokens: ${warchestTokens}`)
         console.log(`Timer Expired Game Over State: ${gameOver}`)
         console.log(`Player1 Cards: ${player1Cards}`)
@@ -540,7 +538,7 @@ const Wargame = () => {
                 </Col>
                 <Col>
                 <div className='my-1 text-center'>
-                  {hasWarchest && warchestTokens > 0 && <Button  variant="success" onClick={payPlayerHandler} className='m-2'>Send {symbols} From Your War Chest to your Wallet?</Button>}
+                  {hasWarchest && warchestTokens > 0 && !hasBet && <Button  variant="success" onClick={payPlayerHandler} className='m-2'>Send {symbols} From Your War Chest to your Wallet?</Button>}
                 </div>
                 </Col>
               </Row>
@@ -566,7 +564,7 @@ const Wargame = () => {
                   </Col>
                   <Col>
                     <Form onSubmit={warchestHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
-                    { isWarchest && !hasWarchest &&
+                    { isWarchest &&
                     <div>
                         <Row>
                               <Form.Text className='text-end my-0' muted>
@@ -594,7 +592,7 @@ const Wargame = () => {
                           </Row>
                       </div>
                       }
-                      {!isWarchest && !hasWarchest && <Button  variant="danger" onClick={isWarchestHandler} className='m-2'>Grab Some {symbols} From Wallet to add to your War Chest?</Button>}
+                      {!isWarchest && !gameOver && !hasBet &&<Button  variant="danger" onClick={isWarchestHandler} className='m-2'>Grab Some {symbols} From Wallet to add to your War Chest?</Button>}
                       {/* {!isPlaying && !gameOver && hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>} */}
                     </Form>
                   </Col>
@@ -623,7 +621,7 @@ const Wargame = () => {
                               </InputGroup>
                           </Row>
                           <Row>
-                            <Button type="submit" className='m-2'>Put Them Into Your Pile!</Button>
+                            <Button type="submit" className='m-2'>Play With This Amount!</Button>
                             <Button onClick={cancelBetHandler} className='m-2'>Cancel</Button>
                           </Row>
                       </div>
