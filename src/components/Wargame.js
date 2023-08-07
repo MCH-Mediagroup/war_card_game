@@ -171,9 +171,9 @@ const Wargame = () => {
 
       setGameTokens(Number(tokenAmount))
 
-      let updateTokens = Number(warchestTokens - tokenAmount)
-      setWarchestTokens(updateTokens)
-      warchestTokens = updateTokens
+      // let updateTokens = Number(warchestTokens - tokenAmount)
+      // setWarchestTokens(updateTokens)
+      // warchestTokens = updateTokens
 
 
       setTokenMultiplier(2)
@@ -252,6 +252,8 @@ const Wargame = () => {
             ) : (
               totalTokensWon = 0
             );
+          } else {
+            totalTokensWon = -(gameTokens + winningsBefore) * tokenMultiplier;
           }
           break;
         case 5: // Lose after timer expires
@@ -262,6 +264,8 @@ const Wargame = () => {
             ) : (
               totalTokensWon = 0
             );
+          } else {
+            totalTokensWon = -(gameTokens + winningsAfter) * tokenMultiplier;
           }
           break;
         default: // Lose
@@ -275,16 +279,14 @@ const Wargame = () => {
       displayTokens = totalTokensWon
 
       let updateTokens = Number(warchestTokens + playerTokens)
+      if (updateTokens < 0) {
+        updateTokens = 0
+        setHasWarchest(false)
+      } else {
+        setHasWarchest(true)
+      }
       setWarchestTokens(updateTokens)
       warchestTokens = updateTokens
-
-      if (warchestTokens > 0)
-      {
-        setHasWarchest(true)
-      } else
-      {
-        setHasWarchest(false)
-      }
 
       console.log(`Computed Player Tokens: ${playerTokens}\n`)
       console.log(`War Chest Tokens: ${warchestTokens}\n`)
@@ -484,7 +486,7 @@ const Wargame = () => {
                   {beginGame ? (
                           <h1 className='my-0 text-center'>Let's Play War!</h1>
                       ) : (!beginGame && !gameOver) ? (
-                          <CountdownTimer targetDate={dateTime} warchestTokens = {warchest} onTimerExpired={() => timerExpiredHandler()} />
+                          <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
                       ) : (gameOver && !beginGame && !timerExpired) ? (
                             <>
                               <ExpiredNotice />
@@ -499,8 +501,10 @@ const Wargame = () => {
                                     <div className='my-1 text-center'>
                                         {
                                           displayTokens > 0 ? (<h5>Total {symbols} Won This Round : {displayTokens}</h5>
-                                          ) : (
+                                          ) :  displayTokens < 0 ? (
                                             <h5>Total {symbols} Lost This Round : {Math.abs(displayTokens)}</h5>
+                                          ) : (
+                                            <h5> No {symbols} Won Or Lost This Round (Tie) </h5>
                                           )
                                         }
 

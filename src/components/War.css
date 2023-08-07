@@ -113,8 +113,8 @@ body {
 }
 .show-results {
   position: relative;
-  height: 50px;
-  top: 45px;
+  height: 65px;
+  top: 50px;
   bottom: 0px;
   z-index: 1;
 }
