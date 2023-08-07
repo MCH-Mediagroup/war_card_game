@@ -18,12 +18,6 @@ import {
     setGameTime,
     setSlowTime,
     setPlayTime,
-    setWarchest,
-    // setPlayGame,
-    // setGameOver,
-    // setWinStatus,
-    // setPlayer1Cards,
-    // setPlayer2Cards,
     payPlayerRequest,
     payPlayerSuccess,
     payPlayerFail,
@@ -72,7 +66,6 @@ export const loadTokens = async (provider, chainId, dispatch) => {
     const wargame = new ethers.Contract(config[chainId].wargame.address, WARGAME_ABI, provider)
     const token = new ethers.Contract(config[chainId].token.address, TOKEN_ABI, provider)
     // Fetch wargame balance
-    //const wargameBalance = ethers.utils.formatUnits(await token.balanceOf(wargame.address), 18)
     const wargameBalance = await token.balanceOf(wargame.address)
   
     dispatch(setBalance([
@@ -82,9 +75,6 @@ export const loadTokens = async (provider, chainId, dispatch) => {
   
     dispatch(setContract(wargame))
 
-    let intWarChest = 0
-    dispatch(setWarchest(intWarChest))
-
     return wargame
   }
 
@@ -92,10 +82,7 @@ export const loadTokens = async (provider, chainId, dispatch) => {
 //------------------------------------------------------------------------------
 // LOAD BALANCE 
 export const loadBalances = async (tokens, account, dispatch) => {
-    // const tokenBalance = await tokens[0].balanceOf(account)
-    // const token = new ethers.Contract(config[chainId].token.address, TOKEN_ABI, provider)
     const balance1 = await tokens.balanceOf(account)
-    //const wargameBalance = ethers.utils.formatUnits(await token.balanceOf(wargame), 18)
   
     dispatch(balancesLoaded([
       ethers.utils.formatUnits(balance1.toString(), 'ether'),
@@ -110,12 +97,6 @@ export const payPlayer = async (provider, wargame, amount,  dispatch) => {
 
     const signer = await provider.getSigner()
 
-    // const prc = 0
-    // // We need to calculate the required ETH in order to buy the tokens...
-    // // Fetch price
-    // const price = ethers.utils.formatUnits(await prc, 18)
-
-    // const value = ethers.utils.parseUnits((amount * price).toString(), 'ether')
     const formattedAmount = ethers.utils.parseUnits(amount.toString(), 'ether')
 
     const transaction = await wargame.connect(signer).payPlayer(formattedAmount, { value: 0 })
@@ -151,59 +132,20 @@ export const withdrawTokens = async (provider, wargame, tokens, amount, dispatch
   } catch (error) {
     dispatch(withdrawFail())
   }
-
-
 }
-
-
 
 // ------------------------------------------------------------------------------
 // SET GAME TIME
 export const saveGameTime = async ( time, dispatch) => {
   dispatch(setGameTime(time))
-
 }
 // ------------------------------------------------------------------------------
 // SET SLOW TIME
 export const saveSlowTime = async ( time, dispatch) => {
   dispatch(setSlowTime(time))
-
 }
 // ------------------------------------------------------------------------------
 // SET PLAY TIME
 export const savePlayTime = async ( time, dispatch) => {
   dispatch(setPlayTime(time))
-
 }
-// // ------------------------------------------------------------------------------
-// // SET PLAY GAME
-// export const savePlayGame = async ( status, dispatch) => {
-//   dispatch(setPlayGame(status))
-
-// }
-// ------------------------------------------------------------------------------
-// SET GAME PILE
-export const saveWarchest = ( status, dispatch) => {
-  dispatch(setWarchest(status))
-
-}
-// // ------------------------------------------------------------------------------
-// // SET GAME OVER
-// export const saveWinStatus = ( status, dispatch) => {
-//   dispatch(setWinStatus(status))
-
-// }
-// // ------------------------------------------------------------------------------
-// // SET NUMBER OF PLAYER CARDS
-// export const savePlayerCards = async ( player1, player2, dispatch) => {
-//   dispatch(setPlayer1Cards(player1))
-//   dispatch(setPlayer2Cards(player2))
-// }
-// // ------------------------------------------------------------------------------
-// // SET NUMBER OF PLAYER 2 CARDS
-// export const savePlayer2Cards = ( status, dispatch) => {
-//   dispatch(setPlayer2Cards(status))
-
-// }
-
-
