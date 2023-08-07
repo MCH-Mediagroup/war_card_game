@@ -51,6 +51,8 @@ const Wargame = () => {
 
   let [gameOver, setGameOver] = useState(false)
   let [winState, setWinState] = useState(0)
+  let [winningsBefore, setWinningsBefore] = useState(100)
+  let [winningsAfter, setWinningsAfter] = useState(50)
   let [data, setCards] = useState([])
   let player1Cards = 0
   let player2Cards = 0
@@ -84,8 +86,8 @@ const Wargame = () => {
   const [isDisabled, setIsDisabled] = useState(false);
 
   // Fetch Countdown
-   const MINUTES_TO_ADD = 60000 * gametime  // default is 1 minute
-  // const MINUTES_TO_ADD = 60000 * .25  // testing
+  //  const MINUTES_TO_ADD = 60000 * gametime  // default is 1 minute
+  const MINUTES_TO_ADD = 60000 * .25  // testing
 
 
   // General variables
@@ -234,13 +236,33 @@ const Wargame = () => {
 
       switch( winState ) {
         case 1: // Win before timer expires
-          totalTokensWon = (gameTokens + 100) * tokenMultiplier;
+          totalTokensWon = (gameTokens + winningsBefore) * tokenMultiplier;
           break;
         case 2: // Win after timer expires
-          totalTokensWon = (gameTokens + 50) * tokenMultiplier;
+          totalTokensWon = (gameTokens + winningsAfter) * tokenMultiplier;
           break;
         case 3: // Draw
           totalTokensWon = gameTokens;
+          break;
+        case 4: // Lose before timer expires
+          if (gameTokens === 0)
+          {
+            warchestTokens >= winningsBefore ? (
+              totalTokensWon -= winningsBefore 
+            ) : (
+              totalTokensWon = 0
+            );
+          }
+          break;
+        case 5: // Lose after timer expires
+          if (gameTokens === 0)
+          {
+            warchestTokens >= winningsAfter ? (
+              totalTokensWon -= winningsAfter 
+            ) : (
+              totalTokensWon = 0
+            );
+          }
           break;
         default: // Lose
           totalTokensWon = 0;
@@ -305,7 +327,7 @@ const Wargame = () => {
 
         if (player2Cards === player1Cards){
           winState = 3} else
-        (winState = player1Cards > player2Cards ? 2 : 0)
+        (winState = player1Cards > player2Cards ? 2 : 5)
         setWinState(winState)
 
 
@@ -388,7 +410,7 @@ const Wargame = () => {
               console.log(`Game Over Player2 Cards: ${player2Cards}\n`)
               if (player2Cards === player1Cards){
                 winState = 3} else
-              (winState = player2Cards <= 4 ? 1 : 0)
+              (winState = player2Cards <= 4 ? 1 : 4)
         
               setWinState(winState)
         
@@ -475,7 +497,13 @@ const Wargame = () => {
                             <Row>
                                 <Col>
                                     <div className='my-1 text-center'>
-                                        <h5>Total {symbols} Won This Round : {displayTokens}</h5>
+                                        {
+                                          displayTokens > 0 ? (<h5>Total {symbols} Won This Round : {displayTokens}</h5>
+                                          ) : (
+                                            <h5>Total {symbols} Lost This Round : {Math.abs(displayTokens)}</h5>
+                                          )
+                                        }
+
                                     </div>
 
                                 </Col>

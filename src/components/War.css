@@ -114,7 +114,7 @@ body {
 .show-results {
   position: relative;
   height: 50px;
-  top: 50px;
+  top: 45px;
   bottom: 0px;
   z-index: 1;
 }
