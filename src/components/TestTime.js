@@ -9,8 +9,6 @@ import {
   saveWinStatus
 } from '../store/interactions'
 
-import './War.css';
-
 
 const TestTime = () => {
 
@@ -57,20 +55,7 @@ const TestTime = () => {
     // setIsButtonDisabled(true);
     setPlay(true);
   };
-  const [isDisabled, setIsDisabled] = useState(false);
 
-  const handleClick = () => {
-    // Do any action you want when the button is clicked
-    console.log('Button clicked!');
-
-    // Disable the button
-    setIsDisabled(true);
-
-    // Re-enable the button after 2 seconds (2000 milliseconds)
-    setTimeout(() => {
-      setIsDisabled(false);
-    }, 1000);
-  };
 
 const handleStartClick = () => {
     
@@ -138,13 +123,16 @@ const handleStartClick = () => {
         <>
           <div className='my-4 text-center'>
                 {!firstRun && <CountdownTimer targetDate={dateTime} timerExpiredHandler={() => timerExpiredHandler()} />} <br />
+                winState = {winState} 
                   <div>
-                  <Button disabled={isDisabled} onClick={handleClick}>
-                    Click Me
-                  </Button>                    
-                  {/* <BattleButton playHandler={() => playHandler()} /> */}
+                     {/* <p>Elapsed time: {time} seconds</p>
+                     <button onClick={stopTimer}>Stop timer</button>
+                     <button onClick={startTimer}>Start timer</button>
+                     <button onClick={restartTimer}>Restart timer</button> */}
                   </div>
-                  winState = {winState} 
+                  <div>
+                    <BattleButton autoPlayHandler={(autoPlay) => autoPlayHandler(autoPlay)} playHandler={() => playHandler()} />
+                  </div>
                   <div>
                     { autoPlay ? (
                       <p>Auto Play!</p>
@@ -164,7 +152,28 @@ const handleStartClick = () => {
 }
 const BattleButton = (props) => {
   const slowtime = useSelector(state => state.wargame.slowtime)
+  const playtime = useSelector(state => state.wargame.playtime)
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(true);
+
+  useEffect(() => {
+    let timeoutId = null;
+
+    if (isRunning) {
+      // Set up the timeout
+      timeoutId = setTimeout(() => {
+        setTime(time + 1);
+      }, 1000); // set timer to 1 second
+    }
+
+     // Clear the timeout if the component is unmounted
+     return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [time, isRunning]); // Re-run the effect when the time or isRunning state changes
 
   useEffect(() => {
     // Set up the interval
@@ -179,10 +188,23 @@ const BattleButton = (props) => {
     };
   }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
+  useEffect(() => {
+    if (time >= playtime){ 
+      setTime(0);
+      setIsRunning(true);
+      props.autoPlayHandler(true);
+    }
+    }, [time, playtime, props]);
+
+  const restartTimer = () => {
+    setTime(0);
+    setIsRunning(true);
+  };
+
     return (
-      <div className="battle-button">
+      <>
         <Button disabled={isButtonDisabled} onClick={props.playHandler} >Battle</Button>
-      </div>
+      </>
     )
 }
 
@@ -190,6 +212,7 @@ const ExpiredNotice = () => {
   return (
     <div className="expired-notice">
       <span>Game Over!!!</span>
+      <p>Please select a future date and time.</p>
     </div>
   );
 };
@@ -222,8 +245,8 @@ const CountdownTimer = (props) => {
     return (
       <>
     <ExpiredNotice />
-    <Button className="show-results" onClick={props.timerExpiredHandler}>
-    Click To Show Results!
+    <Button onClick={props.timerExpiredHandler}>
+    Show
   </Button>
   </>
     );

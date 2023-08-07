@@ -77,7 +77,8 @@ function App() {
           <Route path="/instructions" element={<Instructions />} />
           {/* <Route path="/admin" element={<Admin />} />
           <Route path="/rewards" element={<Rewards />} /> */}
-          {/* <Route path="/testtime" element={<TestTime />} /> */}
+          <Route path="/testgame" element={<TestGame />} />
+          <Route path="/testtime" element={<TestTime />} />
         </Routes>
 
       </HashRouter>

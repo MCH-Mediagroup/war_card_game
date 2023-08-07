@@ -54,8 +54,8 @@ const Wargame = () => {
   let [winningsBefore, setWinningsBefore] = useState(100)
   let [winningsAfter, setWinningsAfter] = useState(50)
   let [data, setCards] = useState([])
-  let player1Cards = 0
-  let player2Cards = 0
+  let [player1Cards, setPlayer1Cards] = useState(0)
+  let [player2Cards, setPlayer2Cards] = useState(0)
   let cards = data;
   let players = [
       [],
@@ -82,12 +82,13 @@ const Wargame = () => {
   let [timerExpired, setTimerExpired] = useState(false)
   const [dateTime, setDateTime] = useState(0)
   const [autoPlay, setAutoPlay] = useState(false);
+  const [play, setPlay] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
   // Fetch Countdown
-  // const MINUTES_TO_ADD = 60000 * gametime  // default is 1 minute
-  const MINUTES_TO_ADD = 60000 * .25  // testing
+   const MINUTES_TO_ADD = 60000 * gametime  // default is 1 minute
+  // const MINUTES_TO_ADD = 60000 * .25  // testing
 
 
   // General variables
@@ -108,29 +109,31 @@ const Wargame = () => {
 
     const playHandler = () => {
 
-      // setAutoPlay(false)
-      setHasPlayed(true)
+      // setHasPlayed(!hasPlayed)
       battle();
 
     }
 
-    const autoPlayHandler = (props) => {
+    const autoPlayHandler = () => {
       // if (!autoPlay)
       // {
-      // setAutoPlay(true);
         // setWinState(winState + 1)
 
         if (!gameOver) 
         {
-          battle();
-          setHasPlayed(false)
+          // setHasPlayed(!hasPlayed)
+          // setAutoPlay(true);
+          playHandler()
+          // battle();
           console.log(`Auto Play issued!\n`)
+          console.log(`Auto Play Player1 Cards: ${player1Cards}`)
+          console.log(`Auto Play Player2 Cards: ${player2Cards}\n`)
+  
         }
       // } else
       // {
       //   setAutoPlay(false)
       // }
-
     }
  
     const isWarchestHandler = async () => {
@@ -317,21 +320,25 @@ const Wargame = () => {
       setGameOver(gameOver)
       setIsDisabled(true)
 
-      console.log(`Game Winner winState: ${winState}\n`)
-      console.log(`Game Winner Game Over State: ${gameOver}\n`)
-      console.log(`Player1 Cards: ${player1Cards}\n`)
-      console.log(`Player2 Cards: ${player2Cards}\n`)
+      // console.log(`Game Winner winState: ${winState}\n`)
+      // console.log(`Game Winner Game Over State: ${gameOver}\n`)
+      // console.log(`Player1 Cards: ${player1Cards}\n`)
+      // console.log(`Player2 Cards: ${player2Cards}\n`)
     }
-    const timerExpiredHandler = () => {
+    const timerExpiredEffectHandler = () => {
       if (!timerExpired)
       {
 
-        let timerExpired = true
-        setTimerExpired(timerExpired)
+      let timerExpired = true
+      setTimerExpired(timerExpired)
 
-        gameOver = true
-        setGameOver(gameOver)
-        setIsDisabled(true)
+      gameOver = true
+      setGameOver(gameOver)
+      setIsDisabled(true)
+      }
+
+    }
+      const timerExpiredHandler = () => {
 
         if (player2Cards === player1Cards){
           winState = 3} else
@@ -347,7 +354,6 @@ const Wargame = () => {
       
         winnerHandler()
 
-      }
     }
 
     const payPlayerHandler = async () => {
@@ -397,8 +403,13 @@ const Wargame = () => {
               checkWinner(card1, card2, pot);
               s1.innerHTML = players[0].length; 
               s2.innerHTML = players[1].length; 
+              setPlayer1Cards(players[0].length);
               player1Cards = players[0].length; 
+              setPlayer2Cards(players[1].length);
               player2Cards = players[1].length; 
+              console.log(`Player1 Cards while playing: ${player1Cards}\n`)
+              console.log(`Player2 Cards while playing: ${player2Cards}\n`)
+
           } else {
               outputMessage("Game over");
           }
@@ -412,7 +423,9 @@ const Wargame = () => {
           if ((players[0].length <= 4) || (players[1].length <= 4)) {
               let gameover = true;
               setGameOver(gameover)
+              setPlayer1Cards(players[0].length);
               player1Cards = players[0].length; 
+              setPlayer2Cards(players[1].length);
               player2Cards = players[1].length; 
               console.log(`Game Over Player1 Cards: ${player1Cards}\n`)
               console.log(`Game Over Player2 Cards: ${player2Cards}\n`)
@@ -493,7 +506,7 @@ const Wargame = () => {
                           <h1 className='my-0 text-center'>Let's Play War!</h1>
                       ) : (!beginGame && !gameOver) ? (
                           <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
-                      ) : (gameOver && !beginGame && !timerExpired) ? (
+                          ) : (gameOver && !beginGame && !timerExpired) ? (
                             <>
                               <ExpiredNotice />
                               <Button className="show-results" onClick={gameWinnerHandler}>
@@ -523,9 +536,8 @@ const Wargame = () => {
                   }
                   <div className='mb-0 text-center'>
                      {!gameOver && !beginGame &&  
-                    <BattleButton autoPlayHandler={(autoPlay) => autoPlayHandler(autoPlay)} playHandler={() => playHandler()} hasPlayed={hasPlayed} />
-                    // <Button disabled={isDisabled} onClick={playHandler} >Fight</Button>
-                     }
+                    <BattleButton autoPlayHandler={(autoPlay) => autoPlayHandler(autoPlay)} playHandler={() => playHandler()} />
+                  }
                   </div>
                 </div>
 
@@ -711,13 +723,12 @@ const BattleButton = (props) => {
     };
   }, [time, isRunning]); // Re-run the effect when the time or isRunning state changes
 
-  // useEffect(() => {
-  //   if (time >= playtime && props.hasPlayed){ 
-  //     setTime(0);
-  //     setIsRunning(true);
-  //     props.autoPlayHandler(true);
-  //   }
-  //   }, [time, playtime, props]);
+  useEffect(() => {
+    if (time >= playtime){ 
+      setTime(0);
+      props.autoPlayHandler(true);
+    }
+    }, [time, playtime, props]);
 
     return (
       <div className="battle-button">
@@ -755,6 +766,13 @@ const ShowCounter = ({ days, hours, minutes, seconds }) => {
 
 const CountdownTimer = (props) => {
   const [days, hours, minutes, seconds] = useCountdown(props.targetDate);
+
+  // useEffect(() => {
+  //   if (days + hours + minutes + seconds <= 0) { 
+  //     props.timerExpiredEffect(true);
+  //   }
+  //   }, [days, hours, minutes, seconds, props]);
+
 
   if (days + hours + minutes + seconds <= 0) {
     return (

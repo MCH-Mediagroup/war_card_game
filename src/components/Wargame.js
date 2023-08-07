@@ -82,11 +82,11 @@ const Wargame = () => {
   let [timerExpired, setTimerExpired] = useState(false)
   const [dateTime, setDateTime] = useState(0)
   const [autoPlay, setAutoPlay] = useState(false);
-  const [play, setPlay] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
   // Fetch Countdown
-  //  const MINUTES_TO_ADD = 60000 * gametime  // default is 1 minute
+  // const MINUTES_TO_ADD = 60000 * gametime  // default is 1 minute
   const MINUTES_TO_ADD = 60000 * .25  // testing
 
 
@@ -108,22 +108,28 @@ const Wargame = () => {
 
     const playHandler = () => {
 
+      // setAutoPlay(false)
+      setHasPlayed(true)
       battle();
 
     }
 
     const autoPlayHandler = (props) => {
-      if (!autoPlay)
-      {
-        setAutoPlay(true);
-        setWinState(winState + 1)
+      // if (!autoPlay)
+      // {
+      // setAutoPlay(true);
+        // setWinState(winState + 1)
 
-        console.log(`Auto Play winState: ${winState}\n`)
-
-      } else
-      {
-        setAutoPlay(false)
-      }
+        if (!gameOver) 
+        {
+          battle();
+          setHasPlayed(false)
+          console.log(`Auto Play issued!\n`)
+        }
+      // } else
+      // {
+      //   setAutoPlay(false)
+      // }
 
     }
  
@@ -311,10 +317,10 @@ const Wargame = () => {
       setGameOver(gameOver)
       setIsDisabled(true)
 
-      // console.log(`Game Winner winState: ${winState}\n`)
-      // console.log(`Game Winner Game Over State: ${gameOver}\n`)
-      // console.log(`Player1 Cards: ${player1Cards}\n`)
-      // console.log(`Player2 Cards: ${player2Cards}\n`)
+      console.log(`Game Winner winState: ${winState}\n`)
+      console.log(`Game Winner Game Over State: ${gameOver}\n`)
+      console.log(`Player1 Cards: ${player1Cards}\n`)
+      console.log(`Player2 Cards: ${player2Cards}\n`)
     }
     const timerExpiredHandler = () => {
       if (!timerExpired)
@@ -517,7 +523,8 @@ const Wargame = () => {
                   }
                   <div className='mb-0 text-center'>
                      {!gameOver && !beginGame &&  
-                        <Button disabled={isDisabled} onClick={playHandler} >Fight</Button>
+                    <BattleButton autoPlayHandler={(autoPlay) => autoPlayHandler(autoPlay)} playHandler={() => playHandler()} hasPlayed={hasPlayed} />
+                    // <Button disabled={isDisabled} onClick={playHandler} >Fight</Button>
                      }
                   </div>
                 </div>
@@ -666,29 +673,51 @@ const Wargame = () => {
   )
 }
 const BattleButton = (props) => {
-//   const slowtime = useSelector(state => state.wargame.slowtime)
+  const slowtime = useSelector(state => state.wargame.slowtime)
+  const playtime = useSelector(state => state.wargame.playtime)
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(true);
 
-//   useEffect(() => {
-//     // Set up the interval
-//     const slowTime = slowtime * 1000
-//     const intervalId = setInterval(() => {
-//       setIsButtonDisabled(prevState => !prevState);
-//     }, slowTime); // Toggle the disabled state of the button every 3 seconds
 
-//     // Clear the interval if the component is unmounted
-//     return () => {
-//       clearInterval(intervalId);
-//     };
-//   }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+  useEffect(() => {
+    // Set up the interval
+    const slowTime = slowtime * 1000
+    const intervalId = setInterval(() => {
+      setIsButtonDisabled(prevState => !prevState);
+    }, slowTime); // Toggle the disabled state of the button every 3 seconds
 
-      // Disable the button
-      setIsButtonDisabled(true);
+    // Clear the interval if the component is unmounted
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
 
-    // Re-enable the button after 2 seconds (2000 milliseconds)
-    setTimeout(() => {
-      setIsButtonDisabled(false);
-    }, 500);
+  useEffect(() => {
+    let timeoutId = null;
+
+    if (isRunning) {
+      // Set up the timeout
+      timeoutId = setTimeout(() => {
+        setTime(time + 1);
+      }, 1000); // set timer to 1 second
+    }
+
+     // Clear the timeout if the component is unmounted
+     return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [time, isRunning]); // Re-run the effect when the time or isRunning state changes
+
+  // useEffect(() => {
+  //   if (time >= playtime && props.hasPlayed){ 
+  //     setTime(0);
+  //     setIsRunning(true);
+  //     props.autoPlayHandler(true);
+  //   }
+  //   }, [time, playtime, props]);
 
     return (
       <div className="battle-button">
