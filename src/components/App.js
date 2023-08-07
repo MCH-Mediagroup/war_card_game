@@ -9,6 +9,7 @@ import Tabs from './Tabs'
 import Wargame from './Wargame';
 import Rewards from './Rewards';
 import Admin from './Admin';
+import Instructions from './Instructions';
 
 import { 
   loadProvider,
@@ -69,14 +70,14 @@ function App() {
 
         <hr />
 
-        {/* <Tabs /> */}
+        <Tabs />
 
         <Routes>
           <Route exact path="/" element={<Wargame />} />
+          <Route path="/instructions" element={<Instructions />} />
           {/* <Route path="/admin" element={<Admin />} />
           <Route path="/rewards" element={<Rewards />} /> */}
-          <Route path="/testgame" element={<TestGame />} />
-          <Route path="/testtime" element={<TestTime />} />
+          {/* <Route path="/testtime" element={<TestTime />} /> */}
         </Routes>
 
       </HashRouter>
