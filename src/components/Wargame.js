@@ -48,6 +48,7 @@ const Wargame = () => {
   const [hasBet, setHasBet] = useState(false)
   const [hasWarchest, setHasWarchest] = useState(false)
   const [isWarchest, setIsWarchest] = useState(false)
+  const [hasWon, setHasWon] = useState(false)
 
   let [gameOver, setGameOver] = useState(false)
   let [winState, setWinState] = useState(0)
@@ -95,7 +96,7 @@ const Wargame = () => {
   const dispatch = useDispatch()
 
   const fetchCardData = () => {
-    fetch("http://192.168.254.133:5050/api/Cards/getcards")
+    fetch("https://warapiapi.azure-api.net/api/Cards/getcards")
       .then(res => res.json())
       .then(data => {
           setCards(data)
@@ -143,7 +144,7 @@ const Wargame = () => {
       e.preventDefault()
       // setShowAlert(false)
       
-      console.log(`War Chest Amount to withdraw: ${warchestAmount}\n`)
+      // console.log(`War Chest Amount to withdraw: ${warchestAmount}\n`)
 
       console.log(`Account : ${account}\n`)
 
@@ -154,7 +155,7 @@ const Wargame = () => {
       let updateTokens = Number(warchestTokens + Number(warchestAmount))
       setWarchestTokens(updateTokens)
       warchestTokens = updateTokens
-      console.log(`Total War Chest Tokens after withdrawal: ${warchestTokens}\n`)
+      // console.log(`Total War Chest Tokens after withdrawal: ${warchestTokens}\n`)
 
       setWarchestAmount(0)
 
@@ -167,7 +168,7 @@ const Wargame = () => {
     const betHandler = async (e) => {
       e.preventDefault()
       
-      console.log(`TokenBetAmount : ${tokenAmount}\n`)
+      // console.log(`TokenBetAmount : ${tokenAmount}\n`)
 
       setGameTokens(Number(tokenAmount))
 
@@ -179,7 +180,7 @@ const Wargame = () => {
       setTokenMultiplier(2)
       tokenMultiplier = 2
 
-      console.log(`Game Tokens betting : ${gameTokens} with multiplier: ${tokenMultiplier}\n`)
+      // console.log(`Game Tokens betting : ${gameTokens} with multiplier: ${tokenMultiplier}\n`)
 
       setPlayerTokens(0)
 
@@ -229,10 +230,10 @@ const Wargame = () => {
 
     const winnerHandler = () => {
 
-      console.log(`War Chest Tokens Before: ${warchestTokens}\n`)
-      console.log(`Winning State: ${winState}\n`)
-      console.log(`Game Tokens before: ${gameTokens}\n`)
-      console.log(`Token multiplier before: ${tokenMultiplier}\n`)
+      // console.log(`War Chest Tokens Before: ${warchestTokens}\n`)
+      // console.log(`Winning State: ${winState}\n`)
+      // console.log(`Game Tokens before: ${gameTokens}\n`)
+      // console.log(`Token multiplier before: ${tokenMultiplier}\n`)
 
       switch( winState ) {
         case 1: // Win before timer expires
@@ -280,8 +281,8 @@ const Wargame = () => {
       setWarchestTokens(updateTokens)
       warchestTokens = updateTokens
 
-      console.log(`Computed Player Tokens: ${playerTokens}\n`)
-      console.log(`War Chest Tokens: ${warchestTokens}\n`)
+      // console.log(`Computed Player Tokens: ${playerTokens}\n`)
+      // console.log(`War Chest Tokens: ${warchestTokens}\n`)
 
       // Reset all player amounts and flags
       setPlayerTokens(0)
@@ -299,14 +300,16 @@ const Wargame = () => {
       let timerExpired = true
       setTimerExpired(timerExpired)
 
+      setHasWon(false)
+
       gameOver = true
       setGameOver(gameOver)
       setIsDisabled(true)
 
-      console.log(`Game Winner winState: ${winState}\n`)
-      console.log(`Game Winner Game Over State: ${gameOver}\n`)
-      console.log(`Player1 Cards: ${player1Cards}\n`)
-      console.log(`Player2 Cards: ${player2Cards}\n`)
+      // console.log(`Game Winner winState: ${winState}\n`)
+      // console.log(`Game Winner Game Over State: ${gameOver}\n`)
+      // console.log(`Player1 Cards: ${player1Cards}\n`)
+      // console.log(`Player2 Cards: ${player2Cards}\n`)
     }
     const timerExpiredHandler = () => {
       if (!timerExpired)
@@ -325,11 +328,11 @@ const Wargame = () => {
         setWinState(winState)
 
 
-        console.log(`Timer Expired winState: ${winState}`)
-        console.log(`Timer Expired War Chest Tokens: ${warchestTokens}`)
-        console.log(`Timer Expired Game Over State: ${gameOver}`)
-        console.log(`Player1 Cards: ${player1Cards}`)
-        console.log(`Player2 Cards: ${player2Cards}\n`)
+        // console.log(`Timer Expired winState: ${winState}`)
+        // console.log(`Timer Expired War Chest Tokens: ${warchestTokens}`)
+        // console.log(`Timer Expired Game Over State: ${gameOver}`)
+        // console.log(`Player1 Cards: ${player1Cards}`)
+        // console.log(`Player2 Cards: ${player2Cards}\n`)
       
         winnerHandler()
 
@@ -338,7 +341,7 @@ const Wargame = () => {
 
     const payPlayerHandler = async () => {
 
-      console.log(`War Chest Tokens before: ${warchest}\n`)
+      // console.log(`War Chest Tokens before: ${warchest}\n`)
 
       // setShowAlert(false)
       
@@ -356,7 +359,7 @@ const Wargame = () => {
     setHasWarchest(false)
     setWarchestTokens(0)
 
-    console.log(`Total War Chest Tokens after reset: ${warchest}\n`)
+    // console.log(`Total War Chest Tokens after reset: ${warchest}\n`)
 
     // setShowAlert(true)
 
@@ -401,13 +404,15 @@ const Wargame = () => {
               setGameOver(gameover)
               player1Cards = players[0].length; 
               player2Cards = players[1].length; 
-              console.log(`Game Over Player1 Cards: ${player1Cards}\n`)
-              console.log(`Game Over Player2 Cards: ${player2Cards}\n`)
+              // console.log(`Game Over Player1 Cards: ${player1Cards}\n`)
+              // console.log(`Game Over Player2 Cards: ${player2Cards}\n`)
               if (player2Cards === player1Cards){
                 winState = 3} else
               (winState = player2Cards <= 4 ? 1 : 4)
         
               setWinState(winState)
+              setHasWon(true)
+
         
               winnerHandler()
 
@@ -482,7 +487,7 @@ const Wargame = () => {
                           <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
                       ) : (gameOver && !beginGame && !timerExpired) ? (
                             <>
-                              <ExpiredNotice />
+                              {/* <ExpiredNotice /> */}
                               <Button className="show-results" onClick={gameWinnerHandler}>
                                   Click To Show Results!
                               </Button>
@@ -519,7 +524,7 @@ const Wargame = () => {
                 <div className='my-1 text-center'>
                   {beginGame && 
                   <Button  onClick={handleStartClick} className='mt-2'>Begin Game</Button>} <br />
-                  {gameOver && 
+                  {gameOver && !hasWon &&
                   <Button  onClick={handlePlayAgainClick} className='mb-3'>Play Again?</Button>} <br />
                 </div>
 

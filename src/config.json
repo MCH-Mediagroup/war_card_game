@@ -9,5 +9,28 @@
     "nft": {
       "address": "0xce830DA8667097BB491A70da268b76a081211814"
     }
+  },
+  "11155111": {
+    "token": {
+      "address": "0xC220Ed128102d888af857d137a54b9B7573A41b2"
+    },
+    "wargame": {
+      "address": "0xfaE849108F2A63Abe3BaB17E21Be077d07e7a9A2"
+    },
+    "nft": {
+      "address": "0xce830DA8667097BB491A70da268b76a081211814"
+    }
+  },
+  "5": {
+    "token": {
+      "address": "0xC220Ed128102d888af857d137a54b9B7573A41b2"
+    },
+    "wargame": {
+      "address": "0xfaE849108F2A63Abe3BaB17E21Be077d07e7a9A2"
+    },
+    "nft": {
+      "address": "0xce830DA8667097BB491A70da268b76a081211814"
+    }
   }
+
 }
