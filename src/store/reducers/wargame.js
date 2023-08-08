@@ -5,7 +5,7 @@ export const wargame = createSlice({
   initialState: {
     contract: null,
     balance: 0,
-    gametime: 1, // Game time in minutes
+    gametime: .5, // Game time in minutes
     slowtime: 1, // Amount of seconds to slow game down
     playtime: 6, // Amount of seconds before game automatically plays
     paying: {
