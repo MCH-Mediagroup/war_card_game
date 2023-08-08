@@ -146,7 +146,7 @@ const Wargame = () => {
       
       // console.log(`War Chest Amount to withdraw: ${warchestAmount}\n`)
 
-      console.log(`Account : ${account}\n`)
+      // console.log(`Account : ${account}\n`)
 
       await withdrawTokens(provider, wargame, tokens, warchestAmount, dispatch)
 
@@ -596,7 +596,9 @@ const Wargame = () => {
                           </Row>
                       </div>
                       }
-                      {!isWarchest && !gameOver && !hasBet && beginGame && <Button  variant="danger" onClick={isWarchestHandler} className='m-2'>Grab Some {symbols} From Wallet to add to your War Chest?</Button>}
+                      {playerBalance > 0 && !isWarchest && !gameOver && !hasBet && beginGame && 
+                      <Button  variant="danger" onClick={isWarchestHandler} 
+                      className='m-2'>Grab Some {symbols} From Wallet to add to your War Chest?</Button>}
                     </Form>
                   </Col>
                   <Col>
@@ -604,15 +606,15 @@ const Wargame = () => {
                     { isBetting && !hasBet &&
                     <div>
                         <Row>
-                              <Form.Text className='text-end my-0' muted>
-                                  Balance: {playerBalance}
+                              <Form.Text className='text-end my-0' >
+                                  Balance: {warchestTokens}
                               </Form.Text>
                               <InputGroup>
                                   <Form.Control
                                       type="number"
                                       placeholder="0.0"
                                       min="1.0"
-                                      max={playerBalance}
+                                      max={warchestTokens}
                                       step="any"
                                       id="token1"
                                       onChange={(e) => amountHandler(e)}
@@ -648,7 +650,7 @@ const Wargame = () => {
 
               )
             }
-                {isPaying || isWithdrawing ? (
+                {/* {isPaying || isWithdrawing ? (
                   <Alert
                   message={'Transaction Pending...'}
                   transactionHash={null}
@@ -671,7 +673,7 @@ const Wargame = () => {
                   />
               ) : (
                   <></>
-        )}
+        )} */}
     </div>
   )
 }
