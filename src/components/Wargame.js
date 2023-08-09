@@ -9,6 +9,7 @@ import Form from 'react-bootstrap/Form';
 import { Row, Col } from 'react-bootstrap'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
+import { Link } from 'react-router-dom';
 
 import Spinner from 'react-bootstrap/Spinner';
 
@@ -644,7 +645,7 @@ const Wargame = () => {
                 className='d-flex justify-content-center align-items-center'
                 style={{ height: '300px' }}
               >
-                Please connect wallet.
+                Please connect your Metamask wallet.  If yours isn't set up yet, please check out the &nbsp; <Link to="/instructions"> Instructions page</Link> for information on how to get yours set up.
               </p>
 
               )

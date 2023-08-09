@@ -12,24 +12,24 @@
   },
   "11155111": {
     "token": {
-      "address": "0xC220Ed128102d888af857d137a54b9B7573A41b2"
+      "address": "0x53963d192C06c46688beF632929eE5C0f851720a"
     },
     "wargame": {
-      "address": "0xfaE849108F2A63Abe3BaB17E21Be077d07e7a9A2"
+      "address": "0x4a6d56C36dfbdB4cd2D78a71674DE0C4E2F8Cd8F"
     },
     "nft": {
-      "address": "0xce830DA8667097BB491A70da268b76a081211814"
+      "address": "0xe073a22C68b64cf1f71b02B484B0785B207969ce"
     }
   },
   "5": {
     "token": {
-      "address": "0xC220Ed128102d888af857d137a54b9B7573A41b2"
+      "address": "0x19612E66b2003875BE47F75047860Eb5815B5014"
     },
     "wargame": {
-      "address": "0xfaE849108F2A63Abe3BaB17E21Be077d07e7a9A2"
+      "address": "0x7eF1c6E7df407892B76a2b9Ef10Bf890867192aa"
     },
     "nft": {
-      "address": "0xce830DA8667097BB491A70da268b76a081211814"
+      "address": "0x21E562A27F3A89C8f335fCCDcB3e3E1B9D8eBf12"
     }
   }
 

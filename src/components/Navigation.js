@@ -37,7 +37,7 @@ const Navigation = () => {
   }
 
   return (
-    <Navbar className='my-3' expand="lg" variant='dark'>
+    <Navbar className='my-1' expand="lg" variant='dark'>
       <img
         alt="logo"
         src={logo}
@@ -45,10 +45,10 @@ const Navigation = () => {
         height="40"
         className="d-inline-block align-top mx-3"
       />
-      <Navbar.Brand href="#">MCH Media Group</Navbar.Brand>
+      <Navbar.Brand href="#"><h4>Card Wars</h4></Navbar.Brand>
       {account && 
-        <div className='mt-3 mx-5 px-5'>
-          <h4>Total Balance: {playerBalance} {symbols}</h4>
+        <div className='mt-1 mx-5 px-5'>
+          <h5>Total Balance: {playerBalance} {symbols}</h5>
         </div>
     }
 
@@ -56,7 +56,7 @@ const Navigation = () => {
 
       <Navbar.Collapse id="nav" className="justify-content-end">
 
-        <div className="d-flex justify-content-end mt-3">
+        <div className="d-flex justify-content-end mt-0">
 
           <Form.Select
               aria-label="Network Selector"

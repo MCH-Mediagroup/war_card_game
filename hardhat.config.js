@@ -11,12 +11,13 @@ module.exports = {
       url: "http://192.168.254.133:6545"
     },
     sepolia: {
-      url: `wss://eth-sepolia.g.alchemy.com/v2/${process.env.SEPOLIA_ALCHEMY_API_KEY}`,
+      url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.SEPOLIA_ALCHEMY_API_KEY}`,
       accounts: privateKeys.split(','),
+      gasPrice: 8000000000
     },
     goerli: {
       url: `https://eth-goerli.g.alchemy.com/v2/${process.env.GOERLI_ALCHEMY_API_KEY}`,
-      accounts: privateKeys.split(','),
+      accounts: privateKeys.split(',')
     }
   },
 };
