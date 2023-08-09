@@ -46,9 +46,11 @@ const Navigation = () => {
         className="d-inline-block align-top mx-3"
       />
       <Navbar.Brand href="#">MCH Media Group</Navbar.Brand>
-      <div className='mt-3 mx-5 px-5'>
-        <h4>Total Balance: {playerBalance} {symbols}</h4>
-      </div>
+      {account && 
+        <div className='mt-3 mx-5 px-5'>
+          <h4>Total Balance: {playerBalance} {symbols}</h4>
+        </div>
+    }
 
       <Navbar.Toggle aria-controls="nav" />
 

@@ -35,10 +35,10 @@ contract Wargame {
         require(msg.sender == owner, "Caller is not the owner");
         _;
     }
-    // receive() external payable {
-    //     uint256 amount = msg.value / price;
-    //     payPlayer(amount * 1e18);
-    // }
+    receive() external payable {
+        uint256 amount = msg.value / price;
+        payPlayer(amount * 1e18);
+    }
 
     function payPlayer( uint256 _amount) public {
         require(token.balanceOf(address(this)) >= _amount, "Balance not >= amount");

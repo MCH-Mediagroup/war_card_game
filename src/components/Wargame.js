@@ -34,7 +34,6 @@ const Wargame = () => {
   const wargame = useSelector(state => state.wargame.contract)
   const gametime = useSelector(state => state.wargame.gametime)
   const playerBalance = useSelector(state => state.tokens.balances)
-  const warchest = useSelector(state => state.tokens.warchest)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const isPaying = useSelector(state => state.wargame.paying.isWithdrawing)
