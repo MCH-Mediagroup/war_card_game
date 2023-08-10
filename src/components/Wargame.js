@@ -37,7 +37,7 @@ const Wargame = () => {
   const playerBalance = useSelector(state => state.tokens.balances)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
-  const isPaying = useSelector(state => state.wargame.paying.isWithdrawing)
+  const isPaying = useSelector(state => state.wargame.paying.isPaying)
   const isSuccessPaying = useSelector(state => state.wargame.paying.isSuccess)
   const payTransactionHash = useSelector(state => state.wargame.paying.transactionHash)
 
@@ -150,17 +150,24 @@ const Wargame = () => {
 
       await withdrawTokens(provider, wargame, tokens, warchestAmount, dispatch)
 
-      await loadBalances(tokens, account, dispatch)
+      console.log(`Success Flag: ${isSuccess}\n`)
 
-      let updateTokens = Number(warchestTokens + Number(warchestAmount))
-      setWarchestTokens(updateTokens)
-      warchestTokens = updateTokens
-      // console.log(`Total War Chest Tokens after withdrawal: ${warchestTokens}\n`)
+      // if (isSuccess)
+      // {
+        await loadBalances(tokens, account, dispatch)
 
-      setWarchestAmount(0)
+        let updateTokens = Number(warchestTokens + Number(warchestAmount))
+        setWarchestTokens(updateTokens)
+        warchestTokens = updateTokens
+        // console.log(`Total War Chest Tokens after withdrawal: ${warchestTokens}\n`)
+  
+        setWarchestAmount(0)
+  
+        setHasWarchest(true)
+        setIsWarchest(false)
+  
+      // }
 
-      setHasWarchest(true)
-      setIsWarchest(false)
 
       // setShowAlert(true)
 
@@ -353,11 +360,16 @@ const Wargame = () => {
           dispatch
       )
 
+      // if (isSuccessPaying)
+      // {
+        // reset war chest tokens
+        setHasWarchest(false)
+        setWarchestTokens(0)
+      // }
+
+
       await loadBalances(tokens, account, dispatch)
 
-    // reset war chest tokens
-    setHasWarchest(false)
-    setWarchestTokens(0)
 
     // console.log(`Total War Chest Tokens after reset: ${warchest}\n`)
 
@@ -471,174 +483,183 @@ const Wargame = () => {
       return (
         <div>
             {account ? (
-              <>
-              <Row>
-                <Col>
-                    <div className='py-4'>
-                        {warchestTokens > 0 && <p className='text-center'><strong></strong> {warchestTokens} {symbols} In War Chest</p>}
-                        {gameTokens > 0 && <p className='text-center'><strong>Number of Tokens playing with:</strong> {gameTokens} {symbols}</p>}
-                    </div>
-               </Col>
-                <Col>
-                <div className='my-0 text-center'>
-                  {beginGame ? (
-                          <h1 className='my-0 text-center'>Let's Play War!</h1>
-                      ) : (!beginGame && !gameOver) ? (
-                          <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
-                      ) : (gameOver && !beginGame && !timerExpired) ? (
-                            <>
-                              {/* <ExpiredNotice /> */}
-                              <Button className="show-results" onClick={gameWinnerHandler}>
-                                  Click To Show Results!
-                              </Button>
-                            </>
-                       ) : (!beginGame && gameOver) && (
-                        <div className='my-0 text-center'>
-                            <Row>
-                                <Col>
-                                    <div className='my-1 text-center'>
-                                        {
-                                          displayTokens > 0 ? (<h5>Total {symbols} Won This Round : {displayTokens}</h5>
-                                          ) :  displayTokens < 0 ? (
-                                            <h5>Total {symbols} Lost This Round : {Math.abs(displayTokens)}</h5>
-                                          ) : (
-                                            <h5> No {symbols} Won Or Lost This Round (Tie) </h5>
-                                          )
-                                        }
-
-                                    </div>
-
-                                </Col>
-                            </Row>
-                          </div>
-                     )
-                  }
-                  <div className='mb-0 text-center'>
-                     {!gameOver && !beginGame &&  
-                    // <BattleButton playHandler={() => playHandler()} />
-                    <Button disabled={isDisabled} onClick={playHandler} >Fight</Button>
-                  }
-                  </div>
-                </div>
-
-                <div className='my-1 text-center'>
-                  {beginGame && 
-                  <Button  onClick={handleStartClick} className='mt-2'>Begin Game</Button>} <br />
-                  {gameOver && !hasWon &&
-                  <Button  onClick={handlePlayAgainClick} className='mb-3'>Play Again?</Button>} <br />
-                </div>
-
-                </Col>
-                <Col>
-                <div className='my-1 text-center'>
-                {isPaying ? (
-                  <Spinner animation="border" style={{ display: 'block', margin: '0 auto' }} />
-                  ) : (
-                    hasWarchest && warchestTokens > 0 && !hasBet && <Button  variant="success" onClick={payPlayerHandler} className='m-2'>Send {symbols} From Your War Chest to your Wallet?</Button>
-                  )
-                }
-                </div>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <div id="wrapper">
-                  <div id="message">Click Fight to Start Game</div>
-                    <div id="board">
-                      <div id="player1" className="players">
-                          <div>SCORE:<span className="score"></span></div>
-                          <div className="hand" ></div>
-                      </div>  
-                      <div id="player2" className="players">
-                          <div>SCORE:<span className="score"></span></div>
-                          <div className="hand" ></div>
+                  <>
+                  <Row>
+                  <Col>
+                      <div className='py-4'>
+                          {warchestTokens > 0 && <p className='text-center'><strong></strong> {warchestTokens} {symbols} In War Chest</p>}
+                          {gameTokens > 0 && <p className='text-center'><strong>Number of Tokens playing with:</strong> {gameTokens} {symbols}</p>}
                       </div>
+                </Col>
+                  <Col>
+                  <div className='my-0 text-center'>
+                    {beginGame ? (
+                            <h1 className='my-0 text-center'>Let's Play War!</h1>
+                        ) : (!beginGame && !gameOver) ? (
+                            <CountdownTimer targetDate={dateTime} onTimerExpired={() => timerExpiredHandler()} />
+                        ) : (gameOver && !beginGame && !timerExpired) ? (
+                              <>
+                                {/* <ExpiredNotice /> */}
+                                <Button className="show-results" onClick={gameWinnerHandler}>
+                                    Click To Show Results!
+                                </Button>
+                              </>
+                        ) : (!beginGame && gameOver) && (
+                          <div className='my-0 text-center'>
+                              <Row>
+                                  <Col>
+                                      <div className='my-1 text-center'>
+                                          {
+                                            displayTokens > 0 ? (<h5>Total {symbols} Won This Round : {displayTokens}</h5>
+                                            ) :  displayTokens < 0 ? (
+                                              <h5>Total {symbols} Lost This Round : {Math.abs(displayTokens)}</h5>
+                                            ) : (
+                                              <h5> No {symbols} Won Or Lost This Round (Tie) </h5>
+                                            )
+                                          }
+
+                                      </div>
+
+                                  </Col>
+                              </Row>
+                            </div>
+                      )
+                    }
+                    <div className='mb-0 text-center'>
+                      {!gameOver && !beginGame &&  
+                      // <BattleButton playHandler={() => playHandler()} />
+                      <Button disabled={isDisabled} onClick={playHandler} >Fight</Button>
+                    }
                     </div>
                   </div>
-                </Col>
-              </Row>
-                <Row>
-                  <Col>
-                  </Col>
-                  <Col>
-                    <Form onSubmit={warchestHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
-                    { isWarchest &&
-                    <div>
-                        <Row>
-                              <Form.Text className='text-end my-0' muted>
-                                  Balance: {playerBalance}
-                              </Form.Text>
-                              <InputGroup>
-                                  <Form.Control
-                                      type="number"
-                                      placeholder="0.0"
-                                      min="1.0"
-                                      max={playerBalance}
-                                      step="any"
-                                      id="token1"
-                                      onChange={(e) => warchestAmountHandler(e)}
-                                      value={warchestAmount === 0 ? "" : warchestAmount}
-                                  />
-                                  <InputGroup.Text style={{ width: "100px" }} className="justify-content-center">
-                                      { symbols }
-                                  </InputGroup.Text>
-                              </InputGroup>
-                          </Row>
-                          <Row>
-                          {isWithdrawing ? (
-                                <Spinner animation="border" style={{ display: 'block', margin: '0 auto' }} />
-                                ) : (
-                                  <>
-                                  <Button type="submit" className='m-2'>Add Them To Your War Chest!</Button>
-                                  <Button onClick={cancelWarchestHandler} className='m-2'>Cancel</Button>
-                                  </>
-                                )}
-                          </Row>
-                      </div>
-                      }
-                      {playerBalance > 0 && !isWarchest && !gameOver && !hasBet && beginGame && 
-                      <Button  variant="danger" onClick={isWarchestHandler} 
-                      className='m-2'>Grab Some {symbols} From Wallet to add to your War Chest?</Button>}
-                    </Form>
-                  </Col>
-                  <Col>
-                  <Form onSubmit={betHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
-                    { isBetting && !hasBet &&
-                    <div>
-                        <Row>
-                              <Form.Text className='text-end my-0' >
-                                  Balance: {warchestTokens}
-                              </Form.Text>
-                              <InputGroup>
-                                  <Form.Control
-                                      type="number"
-                                      placeholder="0.0"
-                                      min="1.0"
-                                      max={warchestTokens}
-                                      step="any"
-                                      id="token1"
-                                      onChange={(e) => amountHandler(e)}
-                                      value={tokenAmount === 0 ? "" : tokenAmount}
-                                  />
-                                  <InputGroup.Text style={{ width: "100px" }} className="justify-content-center">
-                                      { symbols }
-                                  </InputGroup.Text>
-                              </InputGroup>
-                          </Row>
-                          <Row>
-                            <Button type="submit" className='m-2'>Play With This Amount!</Button>
-                            <Button onClick={cancelBetHandler} className='m-2'>Cancel</Button>
-                          </Row>
-                      </div>
-                      }
-                      {hasWarchest && !isBetting && !hasBet && beginGame && <Button  variant="warning" onClick={isBettingHandler} className='m-2'>Use {symbols} From Your War Chest?</Button>}
-                      {!isPlaying && !gameOver && hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>}
-                    </Form>
+
+                  <div className='my-1 text-center'>
+                    {beginGame && 
+                    <Button  onClick={handleStartClick} className='mt-2'>Begin Game</Button>} <br />
+                    {gameOver && !hasWon &&
+                    <Button  onClick={handlePlayAgainClick} className='mb-3'>Play Again?</Button>} <br />
+                  </div>
 
                   </Col>
                   <Col>
+                  <div className='my-1 text-center'>
+                  {isPaying ? (
+                    <>
+                    <Spinner animation="border" style={{ display: 'block', margin: '0 auto' }} />
+                    <p>Accessing Wallet...</p>
+                    </>
+                    ) : (
+                      hasWarchest && warchestTokens > 0 && !hasBet && <Button  variant="success" onClick={payPlayerHandler} className='m-2'>Send {symbols} From Your War Chest to your Wallet?</Button>
+                    )
+                  }
+                  </div>
                   </Col>
                 </Row>
+                <Row>
+                  <Col>
+                    <div id="wrapper">
+                    <div id="message">Click Fight to Start Game</div>
+                      <div id="board">
+                        <div id="player1" className="players">
+                            <div>SCORE:<span className="score"></span></div>
+                            <div className="hand" ></div>
+                        </div>  
+                        <div id="player2" className="players">
+                            <div>SCORE:<span className="score"></span></div>
+                            <div className="hand" ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+                  <Row>
+                    <Col>
+                    </Col>
+                    <Col>
+                      <Form onSubmit={warchestHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
+                      { isWarchest &&
+                      <>
+                        {isWithdrawing ? (
+                          <>
+                            <Spinner animation="border" style={{ display: 'block', margin: '0 auto' }} />
+                            <p>Accessing wallet...</p>
+                          </>
+                          ) : (
+                          <div>
+                            <Row>
+                                  <Form.Text className='text-end my-0' muted>
+                                      Balance: {playerBalance}
+                                  </Form.Text>
+                                  <InputGroup>
+                                      <Form.Control
+                                          type="number"
+                                          placeholder="0.0"
+                                          min="1.0"
+                                          max={playerBalance}
+                                          step="any"
+                                          id="token1"
+                                          onChange={(e) => warchestAmountHandler(e)}
+                                          value={warchestAmount === 0 ? "" : warchestAmount}
+                                      />
+                                      <InputGroup.Text style={{ width: "100px" }} className="justify-content-center">
+                                          { symbols }
+                                      </InputGroup.Text>
+                                  </InputGroup>
+                              </Row>
+                              <Row>
+                                      <>
+                                      <Button type="submit" className='m-2'>Add Them To Your War Chest!</Button>
+                                      <Button onClick={cancelWarchestHandler} className='m-2'>Cancel</Button>
+                                      </>
+                              </Row>
+                          </div>
+                          )}
+                        </>
+
+                        }
+                        {playerBalance > 0 && !isWarchest && !gameOver && !hasBet && beginGame && 
+                        <Button  variant="danger" onClick={isWarchestHandler} 
+                        className='m-2'>Grab Some {symbols} From Wallet to add to your War Chest?</Button>}
+                      </Form>
+                    </Col>
+                    <Col>
+                    <Form onSubmit={betHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
+                      { isBetting && !hasBet &&
+                      <div>
+                          <Row>
+                                <Form.Text className='text-end my-0' >
+                                    Balance: {warchestTokens}
+                                </Form.Text>
+                                <InputGroup>
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="0.0"
+                                        min="1.0"
+                                        max={warchestTokens}
+                                        step="any"
+                                        id="token1"
+                                        onChange={(e) => amountHandler(e)}
+                                        value={tokenAmount === 0 ? "" : tokenAmount}
+                                    />
+                                    <InputGroup.Text style={{ width: "100px" }} className="justify-content-center">
+                                        { symbols }
+                                    </InputGroup.Text>
+                                </InputGroup>
+                            </Row>
+                            <Row>
+                              <Button type="submit" className='m-2'>Play With This Amount!</Button>
+                              <Button onClick={cancelBetHandler} className='m-2'>Cancel</Button>
+                            </Row>
+                        </div>
+                        }
+                        {hasWarchest && !isBetting && !hasBet && beginGame && <Button  variant="warning" onClick={isBettingHandler} className='m-2'>Use {symbols} From Your War Chest?</Button>}
+                        {!isPlaying && !gameOver && hasBet && <h3 className='my-4 text-center'>Playing with : {gameTokens} beginning Tokens and a {tokenMultiplier}X multiplier!</h3>}
+                      </Form>
+
+                    </Col>
+                    <Col>
+                    </Col>
+                  </Row>
               </>
               ) : (
                 <p
