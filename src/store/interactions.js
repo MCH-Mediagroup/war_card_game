@@ -39,10 +39,11 @@ export const loadProvider = (dispatch) => {
 
 export const loadNetwork = async (provider, dispatch) => {
   const { chainId } = await provider.getNetwork()
-  dispatch(setNetwork(chainId))
+  dispatch(setNetwork(chainId.toString()))
 
   return chainId
 }
+
 
 export const loadAccount = async (dispatch) => {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })

@@ -14,7 +14,6 @@ import Spinner from 'react-bootstrap/Spinner';
 
 import './War.css';
 
-
 import {
   payPlayer,
   loadBalances,
@@ -638,6 +637,5 @@ const CountdownTimer = (props) => {
     );
   }
 };
-
 
 export default Wargame
