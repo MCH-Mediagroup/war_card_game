@@ -18,15 +18,6 @@ import {
   loadTokens,
   loadWargame
 } from '../store/interactions';
-import TestGame from './TestGame';
-import TestTime from './TestTime';
-
-
-// ABIs: Import your contract ABIs here
-// import TOKEN_ABI from '../abis/Token.json'
-
-// Config: Import your network config here
-// import config from '../config.json';
 
 function App() {
 
@@ -75,10 +66,8 @@ function App() {
         <Routes>
           <Route exact path="/" element={<Wargame />} />
           <Route path="/instructions" element={<Instructions />} />
-          {/* <Route path="/admin" element={<Admin />} />
-          <Route path="/rewards" element={<Rewards />} /> */}
-          <Route path="/testgame" element={<TestGame />} />
-          <Route path="/testtime" element={<TestTime />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/rewards" element={<Rewards />} />
         </Routes>
 
       </HashRouter>

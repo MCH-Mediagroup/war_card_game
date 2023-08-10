@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import DateTimeDisplay from './DateTimeDisplay';
 import { useCountdown } from '../hooks/useCountdown';
 
-import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import { Row, Col } from 'react-bootstrap'
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -13,7 +12,6 @@ import { Link } from 'react-router-dom';
 
 import Spinner from 'react-bootstrap/Spinner';
 
-import Alert from './Alert'
 import './War.css';
 
 
@@ -38,8 +36,6 @@ const Wargame = () => {
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
   const isPaying = useSelector(state => state.wargame.paying.isPaying)
-  const isSuccessPaying = useSelector(state => state.wargame.paying.isSuccess)
-  const payTransactionHash = useSelector(state => state.wargame.paying.transactionHash)
 
   // Gameplay variables
   const [beginGame, setBeginGame] = useState(true)
@@ -76,14 +72,11 @@ const Wargame = () => {
   let [warchestAmount, setWarchestAmount] = useState(0)
   let [tokenMultiplier, setTokenMultiplier] = useState(1)
   let [warchestTokens, setWarchestTokens] = useState(0)
-  // let displayTokens = 0
   let [displayTokens, setDisplayTokens] = useState(0)
 
   // Timer variables
   let [timerExpired, setTimerExpired] = useState(false)
   const [dateTime, setDateTime] = useState(0)
-  const [autoPlay, setAutoPlay] = useState(false);
-  const [play, setPlay] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
   // Fetch Countdown
@@ -92,7 +85,6 @@ const Wargame = () => {
 
 
   // General variables
-  const [showAlert, setShowAlert] = useState(false)
   const dispatch = useDispatch()
 
   const fetchCardData = () => {
@@ -113,21 +105,6 @@ const Wargame = () => {
 
     }
 
-    const autoPlayHandler = (props) => {
-      if (!autoPlay)
-      {
-        setAutoPlay(true);
-        // setWinState(winState + 1)
-
-        console.log(`Auto Play winState: ${winState}\n`)
-
-      } else
-      {
-        setAutoPlay(false)
-      }
-
-    }
- 
     const isWarchestHandler = async () => {
       setIsWarchest(true)
     }
@@ -142,52 +119,30 @@ const Wargame = () => {
     }
     const warchestHandler = async (e) => {
       e.preventDefault()
-      // setShowAlert(false)
-      
-      // console.log(`War Chest Amount to withdraw: ${warchestAmount}\n`)
-
-      // console.log(`Account : ${account}\n`)
 
       await withdrawTokens(provider, wargame, tokens, warchestAmount, dispatch)
 
       console.log(`Success Flag: ${isSuccess}\n`)
 
-      // if (isSuccess)
-      // {
         await loadBalances(tokens, account, dispatch)
 
         let updateTokens = Number(warchestTokens + Number(warchestAmount))
         setWarchestTokens(updateTokens)
         warchestTokens = updateTokens
-        // console.log(`Total War Chest Tokens after withdrawal: ${warchestTokens}\n`)
   
         setWarchestAmount(0)
   
         setHasWarchest(true)
         setIsWarchest(false)
   
-      // }
-
-
-      // setShowAlert(true)
-
     }
     const betHandler = async (e) => {
       e.preventDefault()
       
-      // console.log(`TokenBetAmount : ${tokenAmount}\n`)
-
       setGameTokens(Number(tokenAmount))
-
-      // let updateTokens = Number(warchestTokens - tokenAmount)
-      // setWarchestTokens(updateTokens)
-      // warchestTokens = updateTokens
-
 
       setTokenMultiplier(2)
       tokenMultiplier = 2
-
-      // console.log(`Game Tokens betting : ${gameTokens} with multiplier: ${tokenMultiplier}\n`)
 
       setPlayerTokens(0)
 
@@ -207,16 +162,13 @@ const Wargame = () => {
       if (beginGame){
           setBeginGame(false);
           setDateTime(Date.now() + (MINUTES_TO_ADD))
-          
         }
-
     };
 
     const handlePlayAgainClick = () => {
     
       if (gameOver){
           setBeginGame(true);
-          // setFirstRun(true);
           firstRun = true;
           setIsDisabled(false)
           setGameOver(false);
@@ -236,11 +188,6 @@ const Wargame = () => {
     let totalTokensWon = 0;
 
     const winnerHandler = () => {
-
-      // console.log(`War Chest Tokens Before: ${warchestTokens}\n`)
-      // console.log(`Winning State: ${winState}\n`)
-      // console.log(`Game Tokens before: ${gameTokens}\n`)
-      // console.log(`Token multiplier before: ${tokenMultiplier}\n`)
 
       switch( winState ) {
         case 1: // Win before timer expires
@@ -288,9 +235,6 @@ const Wargame = () => {
       setWarchestTokens(updateTokens)
       warchestTokens = updateTokens
 
-      // console.log(`Computed Player Tokens: ${playerTokens}\n`)
-      // console.log(`War Chest Tokens: ${warchestTokens}\n`)
-
       // Reset all player amounts and flags
       setPlayerTokens(0)
       setGameTokens(0)
@@ -313,10 +257,6 @@ const Wargame = () => {
       setGameOver(gameOver)
       setIsDisabled(true)
 
-      // console.log(`Game Winner winState: ${winState}\n`)
-      // console.log(`Game Winner Game Over State: ${gameOver}\n`)
-      // console.log(`Player1 Cards: ${player1Cards}\n`)
-      // console.log(`Player2 Cards: ${player2Cards}\n`)
     }
     const timerExpiredHandler = () => {
       if (!timerExpired)
@@ -334,24 +274,12 @@ const Wargame = () => {
         (winState = player1Cards > player2Cards ? 2 : 5)
         setWinState(winState)
 
-
-        // console.log(`Timer Expired winState: ${winState}`)
-        // console.log(`Timer Expired War Chest Tokens: ${warchestTokens}`)
-        // console.log(`Timer Expired Game Over State: ${gameOver}`)
-        // console.log(`Player1 Cards: ${player1Cards}`)
-        // console.log(`Player2 Cards: ${player2Cards}\n`)
-      
         winnerHandler()
 
       }
     }
 
     const payPlayerHandler = async () => {
-
-      // console.log(`War Chest Tokens before: ${warchest}\n`)
-
-      // setShowAlert(false)
-      
 
       warchestTokens !== 0 && await payPlayer(
           provider,
@@ -360,25 +288,16 @@ const Wargame = () => {
           dispatch
       )
 
-      // if (isSuccessPaying)
-      // {
         // reset war chest tokens
         setHasWarchest(false)
         setWarchestTokens(0)
-      // }
 
 
       await loadBalances(tokens, account, dispatch)
 
-
-    // console.log(`Total War Chest Tokens after reset: ${warchest}\n`)
-
-    // setShowAlert(true)
-
     }
 
     // Cards Game below this comment
-
     // game functions
 
       function battle() {
@@ -416,15 +335,12 @@ const Wargame = () => {
               setGameOver(gameover)
               player1Cards = players[0].length; 
               player2Cards = players[1].length; 
-              // console.log(`Game Over Player1 Cards: ${player1Cards}\n`)
-              // console.log(`Game Over Player2 Cards: ${player2Cards}\n`)
               if (player2Cards === player1Cards){
                 winState = 3} else
               (winState = player2Cards <= 4 ? 1 : 4)
         
               setWinState(winState)
               setHasWon(true)
-
         
               winnerHandler()
 
@@ -465,7 +381,6 @@ const Wargame = () => {
 
       function showCard(c, p) {
           var move = p * 40;
-          //var bgColor = (c.icon == "H" || c.icon == "D") ? "red" : "black";
           var bCard = '<div class="icard ' + c.suit + ' " style="left:' + move + 'px">';
           bCard += '<div class="cardtop suit">' + c.num + '<br></div>';
           bCard += '<div class="cardmid suit"></div>';
@@ -527,7 +442,6 @@ const Wargame = () => {
                     }
                     <div className='mb-0 text-center'>
                       {!gameOver && !beginGame &&  
-                      // <BattleButton playHandler={() => playHandler()} />
                       <Button disabled={isDisabled} onClick={playHandler} >Fight</Button>
                     }
                     </div>
@@ -671,85 +585,8 @@ const Wargame = () => {
 
               )
             }
-                {/* {isPaying || isWithdrawing ? (
-                  <Alert
-                  message={'Transaction Pending...'}
-                  transactionHash={null}
-                  variant={'info'}
-                  setShowAlert={setShowAlert}
-                  />
-              ) : (isSuccessPaying || isSuccess) && showAlert ? (
-                  <Alert
-                  message={'Transaction Successful'}
-                  transactionHash={payTransactionHash}
-                  variant={'success'}
-                  setShowAlert={setShowAlert}
-                  />
-              ) : (!isSuccessPaying || !isSuccess) && showAlert ? (
-                  <Alert
-                  message={'Transaction Failed'}
-                  transactionHash={null}
-                  variant={'danger'}
-                  setShowAlert={setShowAlert}
-                  />
-              ) : (
-                  <></>
-        )} */}
     </div>
   )
-}
-const BattleButton = (props) => {
-  const slowtime = useSelector(state => state.wargame.slowtime)
-  const playtime = useSelector(state => state.wargame.playtime)
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const [time, setTime] = useState(0);
-  const [isRunning, setIsRunning] = useState(true);
-
-
-  // useEffect(() => {
-  //   // Set up the interval
-  //   const slowTime = slowtime * 1000
-  //   const intervalId = setInterval(() => {
-  //     setIsButtonDisabled(prevState => !prevState);
-  //   }, slowTime); // Toggle the disabled state of the button every 3 seconds
-
-  //   // Clear the interval if the component is unmounted
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, [slowtime]); // Empty dependency array means this effect runs once on mount and cleanup on unmount
-
-  useEffect(() => {
-    let timeoutId = null;
-
-    if (isRunning) {
-      // Set up the timeout
-      timeoutId = setTimeout(() => {
-        setTime(time + 1);
-      }, 1000); // set timer to 1 second
-    }
-
-     // Clear the timeout if the component is unmounted
-     return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [time, isRunning]); // Re-run the effect when the time or isRunning state changes
-
-  // useEffect(() => {
-  //   if (time >= playtime && props.hasPlayed){ 
-  //     setTime(0);
-  //     setIsRunning(true);
-  //     props.autoPlayHandler(true);
-  //   }
-  //   }, [time, playtime, props]);
-
-    return (
-      <div className="battle-button">
-        <Button disabled={isButtonDisabled} onClick={props.playHandler} >Fight</Button>
-      </div>
-    )
 }
 
 const ExpiredNotice = () => {

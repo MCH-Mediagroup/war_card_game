@@ -17,7 +17,6 @@ async function main() {
   let NAME = 'MCH War Card Game'
   let SYMBOL = 'WARCARDS'
   let MAX_SUPPLY = '1000000'
-  //const PRICE = ethers.utils.parseUnits('0.025', 'ether')
   const COST = ethers.utils.parseUnits("1", "ether") // 1 ETH
 
   const DEPLOY_TIME = new Date().getTime();
@@ -50,32 +49,6 @@ async function main() {
 
   console.log(`${tokensDeployed} Tokens transferred to Wargame\n`)
 
-  // // Configure Accounts for Testing on Localhost
-  // accounts = await ethers.getSigners()
-  // deployer = accounts[0]
-  // player1 = accounts[1]
-  // player2 = accounts[2]
-
-  // // Fetch network
-  // const { chainId } = await ethers.provider.getNetwork()
-
-  // console.log(`Fetching token and transferring to accounts...\n`)
-
-  // //token = await ethers.getContractAt('Token', config[chainId].token.address)
-  // console.log(`Player1 Address: ${player1.address}\n`)
-  // console.log(`Player2 Address: ${player2.address}\n`)
-
-  // // Send tokens to player1
-  // let amount = tokens(50)
-  // transaction = await wargame.connect(player1).payPlayer(amount, { value: ether(0) })
-  // await transaction.wait()
-
-  // // Send tokens to player2
-  // transaction = await wargame.connect(player2).payPlayer(amount, { value: ether(0) })
-  // await transaction.wait()
-  
-  // console.log(`Player1 Amount: ${ await token.balanceOf(player1.address)}\n`)
-  // console.log(`Player2 Amount: ${ await token.balanceOf(player2.address)}\n`)
 
     // Deploy NFT
     NAME = "MCH Generated Wargame NFT"
@@ -86,19 +59,7 @@ async function main() {
     await nft.deployed()
   
     console.log(`Deployed NFT Contract at: ${nft.address}`)
-    
-
-  // // Add accounts to white list
-  // transaction = await crowdsale.connect(deployer).addToWhiteList(accounts[0].address)
-  // transaction = await crowdsale.connect(deployer).addToWhiteList(accounts[1].address)
-  // transaction = await crowdsale.connect(deployer).addToWhiteList(accounts[2].address)
-  // transaction = await crowdsale.connect(deployer).addToWhiteList(accounts[3].address)
-  // await transaction.wait()
-
-  // console.log(`White Listed accounts added to Crowdsale\n`)
-
- 
-}
+   
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.

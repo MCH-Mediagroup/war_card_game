@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-
 import { useSelector, useDispatch } from 'react-redux'
 import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form'
@@ -25,7 +23,6 @@ const Navigation = () => {
     const account = await loadAccount(dispatch)
    
         await loadBalances(tokens, account, dispatch)
-        // console.log(`War Chest Tokens in Nav: ${warchest}\n`)
 
   }
 
