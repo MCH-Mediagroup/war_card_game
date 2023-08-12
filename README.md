@@ -18,6 +18,22 @@
 ### 2. Install Dependencies:
 `npm install`
 
-### 3. Start Hardhat Node:
-In your terminal run:
-`npx hardhat node`
+### 3. Create and Setup .env
+Before running any scripts, you'll want to create a .env file with the following values (see .env.example):
+
+- **GOERLI_ALCHEMY_API_KEY=""**
+- **SEPOLIA_ALCHEMY_API_KEY=""**
+- **PRIVATE_KEYS=""**
+
+### 4. Run tests
+`$ npx hardhat test`
+
+### 5. Start Hardhat node
+`$ npx hardhat node`
+
+### 6. Run deployment script
+In a separate terminal execute:
+`$ npx hardhat run ./scripts/deploy.js --network localhost`
+
+### 7. Start frontend
+`$ npm run start`
