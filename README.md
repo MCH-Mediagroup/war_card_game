@@ -1,5 +1,9 @@
 # War Card Game
 
+This is a simple War Card Game that allows a Player to play against the House.  After each play, the higher card wins and both cards are added to the bottom of the winner's pile.  If there is a tie then there is a "battle" where 4 additional cards are played and the winner gets to add all of the cards to the bottom of their pile.  If there is a tie again, there will be another "battle" with the maximum of 2 chances to break the tie.  This is a timed game, so if someone gets all of the cards before the timer expires, they win.  Also once the timer expires, the player with the most cards is the winner.
+
+The payout for winning is in WARCARDS tokens.  If a player wins before the timer expires, they receive 100 tokens.  If a player wins after the timer expires, they receive 50 tokens.  All tokens are accumulated in the game in a "War Chest" and can be saved to the player's Metamask wallet if they so desire.
+
 ## Technology Stack & Tools
 
 - Solidity (Writing Smart Contract)

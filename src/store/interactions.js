@@ -150,3 +150,8 @@ export const saveSlowTime = async ( time, dispatch) => {
 export const savePlayTime = async ( time, dispatch) => {
   dispatch(setPlayTime(time))
 }
+// ------------------------------------------------------------------------------
+// SET PLAY TIME
+export const saveWithdrawSuccess = async ( transaction, dispatch) => {
+  dispatch(withdrawSuccess(transaction))
+}

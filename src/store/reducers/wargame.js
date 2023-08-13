@@ -10,12 +10,12 @@ export const wargame = createSlice({
     playtime: 6, // Amount of seconds before game automatically plays
     paying: {
       isPaying: false,
-      isSucccess: false,
+      isSuccess: false,
       transactionHash: null
     },
     withdrawing: {
       isWithdrawing: false,
-      isSucccess: false,
+      isSuccess: false,
       transactionHash: null
     },
 

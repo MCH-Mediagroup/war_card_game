@@ -58,7 +58,7 @@ const Navigation = () => {
                   seed={account}
                   size={10}
                   scale={3}
-                  color="#2187D0"
+                  color="#0b0f11"
                   bgColor="#F1F2F9"
                   spotColor="#767F92"
                   className="identicon mx-2"

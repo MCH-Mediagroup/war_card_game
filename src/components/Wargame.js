@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 
+import { ethers } from 'ethers'
+
 import DateTimeDisplay from './DateTimeDisplay';
 import { useCountdown } from '../hooks/useCountdown';
 
@@ -12,6 +14,7 @@ import { Link } from 'react-router-dom';
 
 import Spinner from 'react-bootstrap/Spinner';
 
+import Alert from './Alert'
 import './War.css';
 
 import {
@@ -34,8 +37,10 @@ const Wargame = () => {
   const playerBalance = useSelector(state => state.tokens.balances)
   const isWithdrawing = useSelector(state => state.wargame.withdrawing.isWithdrawing)
   const isSuccess = useSelector(state => state.wargame.withdrawing.isSuccess)
+  const transactionHash = useSelector(state => state.wargame.withdrawing.transactionHash)
+  const isSuccessPaying = useSelector(state => state.wargame.paying.isSuccess)
   const isPaying = useSelector(state => state.wargame.paying.isPaying)
-
+  const payTransactionHash = useSelector(state => state.wargame.paying.transactionHash)
   // Gameplay variables
   const [beginGame, setBeginGame] = useState(true)
   const [isBetting, setIsBetting] = useState(false)
@@ -84,6 +89,7 @@ const Wargame = () => {
 
 
   // General variables
+  const [showAlert, setShowAlert] = useState(false)
   const dispatch = useDispatch()
 
   const fetchCardData = () => {
@@ -118,22 +124,34 @@ const Wargame = () => {
     }
     const warchestHandler = async (e) => {
       e.preventDefault()
+      setShowAlert(false)
+
+      const checkPlayerBalance = playerBalance
+      console.log(`checkPlayerBalance: ${checkPlayerBalance}\n`)
 
       await withdrawTokens(provider, wargame, tokens, warchestAmount, dispatch)
 
-      console.log(`Success Flag: ${isSuccess}\n`)
+        const balance1 = await tokens.balanceOf(account)
+        const formattedAmount = ethers.utils.formatUnits(balance1.toString(), 'ether')
 
         await loadBalances(tokens, account, dispatch)
+        console.log(`playerBalance: ${formattedAmount}\n`)
 
-        let updateTokens = Number(warchestTokens + Number(warchestAmount))
-        setWarchestTokens(updateTokens)
-        warchestTokens = updateTokens
+
+        if (checkPlayerBalance.toString() !== formattedAmount.toString())
+        {
+          let updateTokens = Number(warchestTokens + Number(warchestAmount))
+          setWarchestTokens(updateTokens)
+          warchestTokens = updateTokens
+          setHasWarchest(true)
   
+        }
+
         setWarchestAmount(0)
   
-        setHasWarchest(true)
         setIsWarchest(false)
-  
+
+        setShowAlert(true)
     }
     const betHandler = async (e) => {
       e.preventDefault()
@@ -280,18 +298,22 @@ const Wargame = () => {
 
     const payPlayerHandler = async () => {
 
+      const checkPlayerBalance = playerBalance
+
       warchestTokens !== 0 && await payPlayer(
           provider,
           wargame,
           warchestTokens,
           dispatch
       )
-
-        // reset war chest tokens
-        setHasWarchest(false)
-        setWarchestTokens(0)
-
-
+        const balance1 = await tokens.balanceOf(account)
+        const formattedAmount = ethers.utils.formatUnits(balance1.toString(), 'ether')
+        if (checkPlayerBalance.toString() !== formattedAmount.toString())
+        {
+          // reset war chest tokens
+          setHasWarchest(false)
+          setWarchestTokens(0)
+       }
       await loadBalances(tokens, account, dispatch)
 
     }
