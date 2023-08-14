@@ -11,7 +11,7 @@ The payout for winning is in WARCARDS tokens.  If a player wins before the timer
 - [Hardhat](https://hardhat.org/) (Development Framework)
 - [Ethers.js](https://docs.ethers.io/v5/) (Blockchain Interaction)
 - [Alchemy](https://www.alchemy.com/) (Blockchain Connection)
-- [WEBAPI-C#](Back-end to Get Randomized Cards)
+- WEBAPI-C# (Back-end to Get Randomized Cards)
 
 ## Requirements For Initial Setup
 - Install [NodeJS](https://nodejs.org/en/). We recommend using the latest LTS (Long-Term-Support) version, and preferably installing NodeJS via [NVM](https://github.com/nvm-sh/nvm#intro).
