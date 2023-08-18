@@ -8,13 +8,6 @@ namespace war_API.Controllers
     [ApiController]
     public class CardsController : ControllerBase
     {
-        // private readonly Random? _rand;
-
-        //public Card RandomizeGenericListsMethods()
-        //{
-        //    _rand = new Random();
-        //    return _rand;
-        //}
         [HttpGet("getcards")]
         public List<Card> GetCards()
         {

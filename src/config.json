@@ -5,9 +5,6 @@
     },
     "wargame": {
       "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"
-    },
-    "nft": {
-      "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"
     }
   },
   "11155111": {
@@ -16,9 +13,6 @@
     },
     "wargame": {
       "address": "0x4a6d56C36dfbdB4cd2D78a71674DE0C4E2F8Cd8F"
-    },
-    "nft": {
-      "address": "0xe073a22C68b64cf1f71b02B484B0785B207969ce"
     }
   },
   "5": {
@@ -27,9 +21,6 @@
     },
     "wargame": {
       "address": "0x7eF1c6E7df407892B76a2b9Ef10Bf890867192aa"
-    },
-    "nft": {
-      "address": "0x21E562A27F3A89C8f335fCCDcB3e3E1B9D8eBf12"
     }
   }
 
