@@ -17,6 +17,8 @@ import Spinner from 'react-bootstrap/Spinner';
 import Alert from './Alert'
 import './War.css';
 
+import demo from '../wargame_vid.mp4'
+
 import {
   payPlayer,
   loadBalances,
@@ -509,8 +511,6 @@ const Wargame = () => {
                 </Row>
                   <Row>
                     <Col>
-                    </Col>
-                    <Col>
                       <Form onSubmit={warchestHandler} style={{ maxWidth: '250px', margin: '50px auto' }}>
                       { isWarchest &&
                       <>
@@ -593,21 +593,38 @@ const Wargame = () => {
 
                     </Col>
                     <Col>
-                    </Col>
+                      <div className='my-3' style={{ float: 'right' }}>
+                         <h3 className='text-center'><strong>Demo Video</strong></h3>
+                         <video controls height={281} width={500} style={{ border: '1px solid black' }}>
+                         <source src={demo} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                    </div>
+                   </Col>
                   </Row>
               </>
               ) : (
-                <p
-                className='d-flex justify-content-center align-items-center'
-                style={{ height: '300px' }}
-              >
-                Please connect your Metamask wallet.  If yours isn't set up yet, please check out the &nbsp; <Link to="/instructions"> Instructions page</Link> for information on how to get yours set up.
-              </p>
-
+                <>
+                  <p
+                    className='d-flex justify-content-center align-items-center'
+                     style={{ height: '200px' }}
+                  >
+                  Please connect your Metamask wallet.  If yours isn't set up yet, please check out the &nbsp; <Link to="/instructions"> Instructions page</Link> for information on how to get yours set up.
+                 </p>
+                  <div className='mb-3 text-center'>
+                    <h3 className='text-center'><strong>Demo Video</strong></h3>
+                    <video controls height={281} width={500} style={{ border: '1px solid black' }}>
+                    <source src={demo} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </>
               )
-            }
+    }
+
     </div>
-  )
+
+)
 }
 
 const ExpiredNotice = () => {

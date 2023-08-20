@@ -1,3 +1,7 @@
+import { Row, Col } from 'react-bootstrap'
+
+import demo from '../wargame_vid.mp4'
+
 const Instructions = () => {
     return (
         <>
@@ -16,21 +20,31 @@ const Instructions = () => {
                 <li>Once you connect, you will need to import the WARCARDS token at the below token address.  This will allow you to see the token in Metamask.  That same amount is also shown at the top of the game screen.</li>
                 <li>You then just need to follow the instructions on the buttons to send tokens to your wallet or withdraw them to use within the game.</li>
             </ol>
+            <Row>
+                  <Col>
+                        <strong className='mx-3' >Sepolia Testnet Ether Faucets</strong>
+                        <ul className='ms-3'>
+                            <li><a target="_blank" rel='noreferrer' href='https://sepoliafaucet.com'>Alchemy</a></li>
+                            <li><a target="_blank" rel='noreferrer' href='https://faucet.quicknode.com/ethereum/sepolia'>QuickNode</a></li>
+                            <li><a target="_blank" rel='noreferrer' href='https://www.infura.io/faucet/sepolia'>Infura</a></li>
+                        </ul>
+                        <strong className='mx-3'>Token Address</strong>
+                        <ul className='ms-3'>
+                            <li><span className='underline'>WARCARDS: </span>0x53963d192C06c46688beF632929eE5C0f851720a</li>
+                        </ul>
+                  </Col>
+                  <Col>
+                    <div className='mb-3' style={{ float: 'right' }}>
+                    <h3 className='text-center'><strong>Demo Video</strong></h3>
+                    <video controls height={281} width={500} style={{ border: '1px solid black' }}>
+                    <source src={demo} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                    </div>
+                  </Col>
+            </Row>
 
-            <strong className='mx-3' >Sepolia Testnet Ether Faucets</strong>
-            <ul className='ms-3'>
-              <li><a target="_blank" rel='noreferrer' href='https://sepoliafaucet.com'>Alchemy</a></li>
-              <li><a target="_blank" rel='noreferrer' href='https://faucet.quicknode.com/ethereum/sepolia'>QuickNode</a></li>
-              <li><a target="_blank" rel='noreferrer' href='https://www.infura.io/faucet/sepolia'>Infura</a></li>
-            </ul>
 
-            <br />
-
-            <strong className='mx-3'>Token Address</strong>
-            <ul className='ms-3'>
-              <li><span className='underline'>WARCARDS: </span>0x53963d192C06c46688beF632929eE5C0f851720a</li>
-            </ul>
-            <br />
             <h3>Rules Section</h3>
             <hr />
             <h4>How to Play the Card Game "War"</h4>
