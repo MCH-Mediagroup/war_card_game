@@ -7,9 +7,9 @@ const privateKeys = process.env.PRIVATE_KEYS || ""
 module.exports = {
   solidity: "0.8.9",
   networks: {
-    // localhost: {
-    //   url: "http://192.168.254.133:6545"
-    // },
+    localhost: {
+      url: "http://192.168.254.133:6545"
+    },
     sepolia: {
       url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.SEPOLIA_ALCHEMY_API_KEY}`,
       accounts: privateKeys.split(','),

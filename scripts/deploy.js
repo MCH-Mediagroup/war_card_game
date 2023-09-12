@@ -48,7 +48,7 @@ async function main() {
 
 
   console.log(`${tokensDeployed} Tokens transferred to Wargame\n`)
-
+}
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main().catch((error) => {
